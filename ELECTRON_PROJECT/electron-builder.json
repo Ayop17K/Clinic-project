@@ -1,0 +1,30 @@
+{
+  "appId": "com.clinic.budget-app",
+  "productName": "Clinic Budget Planning",
+  "files": [
+    "dist/**/*",
+    "public/electron.js",
+    "public/preload.js",
+    "src/services/**/*",
+    "node_modules/**/*"
+  ],
+  "directories": {
+    "buildResources": "public",
+    "output": "dist_electron"
+  },
+  "win": {
+    "target": [
+      "portable",
+      "nsis"
+    ],
+    "certificateFile": null,
+    "certificatePassword": null
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Clinic Budget Planning"
+  }
+}

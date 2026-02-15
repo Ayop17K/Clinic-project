@@ -1,0 +1,160 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>
+      <ion-icon name="document-text-outline" style="vertical-align: middle; margin-right: 10px; color: #2563eb;"></ion-icon>
+      บันทึกแผนการใช้จ่าย (Plan Record)
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding" style="background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%); min-height: 100vh;">
+  <div class="ion-text-center" style="margin-bottom: 12px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+    <div style="display: flex; gap: 10px; justify-content: center;">
+      <ion-button fill="outline" color="primary" size="small" (click)="toggleTable()" style="border-radius: 18px; min-width: 120px;">
+        <ion-icon [name]="tableCollapsed ? 'chevron-forward-outline' : 'chevron-down-outline'" slot="start"></ion-icon>
+        {{ tableCollapsed ? 'แสดงตาราง' : 'ย่อ/ซ่อนตาราง' }}
+      </ion-button>
+      <ion-button size="small" color="medium" (click)="goToNavigator()" style="border-radius: 18px; min-width: 110px;">
+        <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+        กลับหน้าหลัก
+      </ion-button>
+      <ion-button size="small" color="tertiary" (click)="goToAllPlan()" style="border-radius: 18px; min-width: 110px;">
+        <ion-icon name="cash-outline" slot="start"></ion-icon>
+        กลับแผนหลัก
+      </ion-button>
+    </div>
+  </div>
+  <div class="ion-text-center" style="margin-bottom: 18px;">
+    <div style="font-size: 1.15em; color: #1e293b; font-weight: 500; letter-spacing: 0.2px;">โรงพยาบาลส่งเสริมสุขภาพตำบลหนองปลิง อำเภอเมือง จังหวัดกำแพงเพชร</div>
+    <div style="color: #64748b; font-size: 1em; margin-top: 2px;">สังกัด องค์การบริหารส่วนจังหวัดกำแพงเพชร</div>
+    <div style="margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+      <strong style="font-size: 1.18em; color: #2563eb; letter-spacing: 0.5px;">ประจำปีงบประมาณ พ.ศ.</strong>
+      <ion-select interface="popover" style="min-width: 90px; font-size: 1.18em; color: #2563eb; font-weight: bold; background: #e0e7ef; border-radius: 6px; border: 1.2px solid #2563eb; padding: 2px 6px;"
+        [(ngModel)]="planYear" (ionChange)="loadYearData(planYear)" [disabled]="availableYears.length === 0">
+        <ion-select-option *ngFor="let y of availableYears" [value]="y">{{ y }}</ion-select-option>
+      </ion-select>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 18px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; align-items: center;">
+    <ion-button size="small" color="primary" (click)="toggleAllSubRows()" style="border-radius: 20px; min-width: 110px;">
+      <ion-icon [name]="allSubRowsCollapsed ? 'chevron-down-outline' : 'chevron-up-outline'" slot="start"></ion-icon>
+      {{ allSubRowsCollapsed ? 'แสดงรายการย่อยทั้งหมด' : 'ซ่อนรายการย่อยทั้งหมด' }}
+    </ion-button>
+    <ion-button size="small" color="secondary" (click)="exportToCSV()" style="border-radius: 20px; min-width: 110px;">
+      <ion-icon name="download-outline" slot="start"></ion-icon>
+      Export CSV
+    </ion-button>
+    <ion-button size="small" color="danger" (click)="confirmDeleteRow()" [disabled]="!planYear || planRows.length === 0" style="border-radius: 20px; min-width: 110px;">
+      <ion-icon name="trash-outline" slot="start"></ion-icon>
+      ลบทั้งปีนี้
+    </ion-button>
+  </div>
+  <div *ngIf="!tableCollapsed" style="overflow-x:auto; border-radius: 16px; box-shadow: 0 4px 24px #2563eb18; background: #fff; padding: 14px 8px 18px 8px;">
+    <table style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 1em; color: #222; background: #fff; border-radius: 12px; overflow: hidden;">
+      <thead>
+        <tr style="background: linear-gradient(90deg, #e0e7ef 0%, #f1f5f9 100%); color: #111; border-bottom: 2.5px solid #2563eb;">
+          <th style="border: 1px solid #d1d5db; padding: 8px;">ลำดับที่</th>
+          <th style="border: 1px solid #d1d5db; padding: 8px;">รายการ</th>
+          <th style="background: #ffe066; color: #222; border: 1px solid #e5e7eb; padding: 7px;">งบประมาณ อปท.</th>
+          <th style="background: #ffe066; color: #222; border: 1px solid #e5e7eb; padding: 7px;">เงินบำรุง</th>
+          <th *ngFor="let m of monthNames" style="border: 1px solid #d1d5db; padding: 8px;">{{ m }}</th>
+          <th style="border: 1px solid #d1d5db; padding: 8px;">รวม</th>
+          <!-- Removed delete column header -->
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let idx of [].constructor(11); let i = index">
+          <tr [ngStyle]="{'background': i % 2 === 0 ? '#f3f6fa' : '#fff'}">
+            <td style="border: 1px solid #e5e7eb; padding: 8px 7px; text-align: center; color: #2563eb; font-weight: 600; background: #f1f5f9; position: relative;">
+              <div style="display: flex; align-items: center; justify-content: center; gap: 2px;">
+                <span>{{ i + 1 }}</span>
+                <ion-button fill="clear" size="small" color="medium" (click)="toggleSubRowsCollapsed(i)" style="margin:0; padding:0; min-width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center;">
+                  <ion-icon [name]="subRowsCollapsed[i] ? 'chevron-down-outline' : 'chevron-up-outline'" slot="icon-only"></ion-icon>
+                </ion-button>
+              </div>
+            </td>
+            <td style="border: 1px solid #e5e7eb; padding: 8px 7px; color: #1e293b; font-weight: 500; min-width: 120px; max-width: 320px; white-space: pre-line; word-break: break-word; position: relative;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span>
+                  <ng-container *ngIf="i === 0">
+                    ค่ายาและเวชภัณฑ์
+                  </ng-container>
+                  <ng-container *ngIf="i !== 0">
+                    {{ [
+                      '',
+                      'ค่าวัสดุ',
+                      'ค่าตอบแทนทางการแพทย์',
+                      'ค่าบริการทางการแพทย์',
+                      'ค่าครุภัณฑ์ ที่ดิน และสิ่งก่อสร้าง',
+                      'ค่าใช้สอย',
+                      'ค่าสาธารณูปโภค',
+                      'ค่าจ้างลูกจ้างชั่วคราว',
+                      'ค่าตอบแทนการปฏิบัติงานนอกเวลาราชการ',
+                      'ค่าใช้จ่ายการเดินทางไปราชการ/ค่าใช้จ่ายในการเข้ารับการฝึกอบรม',
+                      'ค่าใช้จ่ายอื่นที่จำเป็นที่เกี่ยวข้องกับการสาธารณสุข'
+                    ][i] }}
+                  </ng-container>
+                </span>
+                <span *ngIf="planRows[i]?.subRows && planRows[i].subRows.length > 0" style="margin-left: 8px;"></span>
+                <!-- Add button placeholder for alignment, if needed -->
+              </div>
+            </td>
+            <td style="background: #fffbe6; border: 1px solid #e5e7eb; padding: 8px 7px; text-align: right; color: #b68900; font-weight: 500;">
+              {{ planRows[i]?.budget_op ? (planRows[i].budget_op | number:'1.2-2') : '-' }}
+            </td>
+            <td style="background: #fffbe6; border: 1px solid #e5e7eb; padding: 8px 7px; text-align: right; color: #2563eb; font-weight: 500;">
+              {{ planRows[i]?.budget_fund ? (planRows[i].budget_fund | number:'1.2-2') : '-' }}
+            </td>
+            <td *ngFor="let m of months" style="border: 1px solid #e5e7eb; padding: 7px; text-align: right;">
+              {{ planRows[i]?.[m] ? (planRows[i][m] | number:'1.2-2') : '-' }}
+            </td>
+            <td style="border: 1px solid #e5e7eb; padding: 7px; text-align: right; font-weight: bold; color: #2563eb; background: #f1f5f9;">
+              {{ planRows[i]?.total ? (planRows[i].total | number:'1.2-2') : '-' }}
+            </td>
+          </tr>
+          <!-- Sub-rows for each main row (must be inside the main row's ngFor for 'i' to be in scope) -->
+          <ng-container *ngIf="planRows[i]?.subRows && !subRowsCollapsed[i]">
+            <ng-container *ngFor="let sub of planRows[i].subRows; let si = index">
+              <tr class="sub-row-hover">
+                <td style="border: 1px solid #e5e7eb; text-align: center; background: #fffbe6;">{{ i + 1 }}.{{ si + 1 }}</td>
+                <td style="border: 1px solid #e5e7eb; color: #b68900; background: #fffbe6;">{{ sub.name }}</td>
+                <td style="border: 1px solid #e5e7eb; text-align: right; background: #fffbe6;">{{ sub.budget_op ? (sub.budget_op | number:'1.2-2') : '-' }}</td>
+                <td style="border: 1px solid #e5e7eb; text-align: right; background: #fffbe6;">{{ sub.budget_fund ? (sub.budget_fund | number:'1.2-2') : '-' }}</td>
+                <td *ngFor="let m of months" style="border: 1px solid #e5e7eb; text-align: right; background: #fffbe6;">{{ sub[m] ? (sub[m] | number:'1.2-2') : '-' }}</td>
+                <td style="border: 1px solid #e5e7eb; text-align: right; font-weight: bold; background: #fef08a;">{{ sub.total ? (sub.total | number:'1.2-2') : '-' }}</td>
+              </tr>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+      </tbody>
+      <tfoot>
+        <tr style="background: linear-gradient(90deg, #e0e7ef 0%, #f1f5f9 100%); font-weight: bold; border-top: 2.5px solid #2563eb;">
+          <td style="border: 1px solid #e5e7eb; text-align: center; background: #f1f5f9;"></td>
+          <td style="border: 1px solid #e5e7eb; text-align: left; background: #f1f5f9; color: #2563eb;">รวม</td>
+          <td style="background: #fffbe6; border: 1px solid #e5e7eb; text-align: right; color: #b68900; font-weight: 600;">{{ summary.budget_op ? (summary.budget_op | number:'1.2-2') : '0.00' }}</td>
+          <td style="background: #fffbe6; border: 1px solid #e5e7eb; text-align: right; color: #2563eb; font-weight: 600;">{{ summary.budget_fund ? (summary.budget_fund | number:'1.2-2') : '0.00' }}</td>
+          <td *ngFor="let m of months" style="border: 1px solid #e5e7eb; text-align: right;">{{ summary[m] ? (summary[m] | number:'1.2-2') : '0.00' }}</td>
+          <td style="border: 1px solid #e5e7eb; text-align: right; color: #2563eb; background: #f1f5f9; font-weight: 700; min-width: 90px; max-width: 90px; width: 90px;">
+            <span style="display: inline-block; width: 100%; text-align: right;">{{ summary.total ? (summary.total | number:'1.2-2') : '0.00' }}&nbsp;</span>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</ion-content>
+<style>
+.sub-row-hover:hover td {
+  background: #ffe066 !important;
+  transition: background 0.15s;
+}
+</style>
+      <tfoot>
+        <tr style="background: linear-gradient(90deg, #e0e7ef 0%, #f1f5f9 100%); font-weight: bold; border-top: 2.5px solid #2563eb;">
+          <td style="border: 1px solid #e5e7eb; text-align: center; background: #f1f5f9;"></td>
+          <td style="border: 1px solid #e5e7eb; text-align: left; background: #f1f5f9; color: #2563eb;">รวม</td>
+          <td style="background: #fffbe6; border: 1px solid #e5e7eb; text-align: right; color: #b68900; font-weight: 600;">{{ summary.budget_op ? (summary.budget_op | number:'1.2-2') : '0.00' }}</td>
+          <td style="background: #fffbe6; border: 1px solid #e5e7eb; text-align: right; color: #2563eb; font-weight: 600;">{{ summary.budget_fund ? (summary.budget_fund | number:'1.2-2') : '0.00' }}</td>
+          <td *ngFor="let m of months" style="border: 1px solid #e5e7eb; text-align: right;">{{ summary[m] ? (summary[m] | number:'1.2-2') : '0.00' }}</td>
+          <td style="border: 1px solid #e5e7eb; text-align: right; color: #2563eb; background: #f1f5f9; font-weight: 700; min-width: 90px; max-width: 90px; width: 90px;">
+            <span style="display: inline-block; width: 100%; text-align: right;">{{ summary.total ? (summary.total | number:'1.2-2') : '0.00' }}&nbsp;</span>

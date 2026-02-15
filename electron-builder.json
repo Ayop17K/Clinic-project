@@ -1,0 +1,51 @@
+{
+  "appId": "com.clinic.app",
+  "productName": "Clinic Manager",
+  "directories": {
+    "buildResources": "assets",
+    "output": "dist_electron"
+  },
+  "files": [
+    "www/**/*",
+    "electron/main.js",
+    "electron/preload.js",
+    "!www/**/*.map",
+    "package.json"
+  ],
+  "win": {
+    "target": [
+      "nsis",
+      "portable"
+    ],
+    "certificateFile": null,
+    "certificatePassword": null,
+    "signingHashAlgorithms": [
+      "sha256"
+    ],
+    "sign": null
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Clinic Manager"
+  },
+  "portable": {
+    "artifactName": "${productName}-${version}-portable.exe"
+  },
+  "mac": {
+    "target": [
+      "dmg",
+      "zip"
+    ],
+    "category": "public.app-category.business"
+  },
+  "linux": {
+    "target": [
+      "AppImage",
+      "deb"
+    ],
+    "category": "Utility"
+  }
+}
