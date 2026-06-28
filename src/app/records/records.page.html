@@ -1,155 +1,159 @@
-<ion-menu side="start" menuId="main-menu" contentId="main-content">
-  <ion-header>
-    <ion-toolbar color="primary">
-      <ion-title>เมนู</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <ion-content>
-    <ion-list>
-      <ion-item routerLink="/financial-plans">
-        <ion-icon name="cash-outline" slot="start" color="success"></ion-icon>
-        เพิ่มข้อมูลงบจัดสรร
-      </ion-item>
-      <ion-item routerLink="/menu-6">
-        <ion-icon name="add-circle-outline" slot="start" color="primary"></ion-icon>
-        เพิ่มข้อมูลแผนการเงิน
-      </ion-item>
-      <ion-item routerLink="/records">
-        <ion-icon name="list-outline" slot="start" color="tertiary"></ion-icon>
-        เรียกดูข้อมูล
-      </ion-item>
-    </ion-list>
-  </ion-content>
-</ion-menu>
+<!-- Records Page — สรุปข้อมูลทั้งหมด -->
 
 <ion-header [translucent]="true">
-  <ion-toolbar color="light">
+  <ion-toolbar class="rec-toolbar">
     <ion-buttons slot="start">
-      <ion-menu-button menu="main-menu"></ion-menu-button>
-      <ion-back-button defaultHref="/navigator"></ion-back-button>
+      <ion-back-button defaultHref="/navigator" text="กลับ"></ion-back-button>
     </ion-buttons>
     <ion-title>
-      <ion-icon name="list-outline" style="vertical-align: middle; margin-right: 8px;" color="primary"></ion-icon>
-      Records
+      <ion-icon name="albums-outline" class="rec-toolbar-icon"></ion-icon>
+      สรุปข้อมูลทั้งหมด
     </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="simulate5YearsData()" fill="solid" color="tertiary" class="rec-export-btn" style="--border-radius: 8px; font-size: 0.88em; margin-right: 8px;">
+        <ion-icon name="server-outline" slot="start"></ion-icon>
+        จำลองข้อมูล 5 ปี
+      </ion-button>
+      <ion-button (click)="exportCSV()" fill="solid" color="secondary" class="rec-export-btn">
+        <ion-icon name="download-outline" slot="start"></ion-icon>
+        Export CSV
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content id="main-content" [fullscreen]="true" class="ion-padding">
-  <ion-button expand="block" color="secondary" (click)="exportCSV()">
-    <ion-icon name="download-outline" slot="start"></ion-icon>
-    Export as CSV
-  </ion-button>
+<ion-content [fullscreen]="true" class="rec-content">
+  <div class="rec-container">
 
-  <!-- ปุ่มเลือกปี (ย้ายออกมานอกกรอบและไว้บนสุดใต้ export) -->
-  <ion-item lines="none" style="max-width: 200px; margin: 16px 0 0 0; --background: transparent;">
-    <ion-select [(ngModel)]="selectedYear" placeholder="เลือกปี" interface="popover">
-      <ion-select-option *ngFor="let year of recordYears" [value]="year">
-        {{ getBuddhistYear(year) }}
-      </ion-select-option>
-    </ion-select>
-    <ion-button slot="end" color="primary" (click)="clearYearFilter()" *ngIf="selectedYear" size="small" style="margin-left: 4px;">
-      ล้าง
-    </ion-button>
-  </ion-item>
-
-  <!-- แผนการเงิน (Menu-6) Section -->
-  <ion-card style="margin-top:16px;">
-    <ion-card-header (click)="showRecords = !showRecords" style="cursor:pointer;">
-      <ion-card-title style="display: flex; align-items: center; justify-content: center;">
-        <ion-icon name="document-text-outline" color="primary" style="margin-right: 8px;"></ion-icon>
-        <span>แผนการเงิน</span>
-        <ion-icon [name]="showRecords ? 'chevron-up-outline' : 'chevron-down-outline'" style="margin-left: 8px;"></ion-icon>
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content *ngIf="showRecords">
-      <ion-list>
-        <ion-item *ngFor="let entry of filteredSavedEntries; let i = index">
-          <ion-avatar slot="start">
-            <ion-icon name="document-text-outline" color="primary"></ion-icon>
-          </ion-avatar>
-          <ion-label>
-            <h2>{{ entry.itemName || ('Entry ' + (i + 1)) }}</h2>
-            <p>
-              <strong>เบิก:</strong> {{ entry.withdraw }} บาท<br>
-              <strong>ประเภท:</strong> {{ entry.withdrawType }}<br>
-              <strong>Date:</strong> {{ getBuddhistDate(entry.date) }}
-            </p>
-          </ion-label>
-          <ion-button fill="clear" color="danger" (click)="deleteEntry(i)">
-            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-          </ion-button>
-        </ion-item>
-        <ion-item *ngIf="filteredSavedEntries.length === 0">
-          <ion-label class="ion-text-center">ไม่มีข้อมูล</ion-label>
-        </ion-item>
-      </ion-list>
-    </ion-card-content>
-  </ion-card>
-
-  <!-- งบจัดสรร Section: always shown -->
-  <ion-card style="margin-top:16px;">
-    <ion-card-header style="display: flex; align-items: center; justify-content: space-between; cursor:pointer;">
-      <div style="display: flex; align-items: center;" (click)="showPlans = !showPlans">
-        <ion-card-title style="margin: 0;">
-          <ion-icon name="cash-outline" color="success"></ion-icon>
-          งบจัดสรร
-          <ion-icon [name]="showPlans ? 'chevron-up-outline' : 'chevron-down-outline'" style="margin-left: 8px;"></ion-icon>
-        </ion-card-title>
+    <!-- Summary Stats -->
+    <div class="rec-stats-row">
+      <div class="rec-stat-card rec-stat-blue">
+        <div class="stat-icon"><ion-icon name="document-text-outline"></ion-icon></div>
+        <div class="stat-info">
+          <div class="stat-value">{{ savedEntries.length }}</div>
+          <div class="stat-label">รายการแผนการเงิน</div>
+        </div>
       </div>
-      <!-- ลบปุ่มเลือกปีออกจากงบจัดสรร -->
-    </ion-card-header>
-    <ion-card-content *ngIf="showPlans">
-      <ion-list>
-        <ion-item *ngFor="let plan of filteredFinancialPlans; let i = index">
-          <ion-avatar slot="start">
-            <ion-icon name="cash-outline" color="success"></ion-icon>
-          </ion-avatar>
-          <ion-label>
-            <h2>
-              ปีงบประมาณ: 
-              <span style="margin-right: 8px;">
-                {{ getBuddhistYear(plan.date) }}
-              </span>
-            </h2>
-            <p>
-              <strong>งบตั้งต้น:</strong> {{ plan.name }} บาท<br>
-              <strong>งบคงเหลือ:</strong> <ion-text color="primary">{{ getRemainingBudget(plan) | number:'1.2-2' }} บาท</ion-text>
-            </p>
-          </ion-label>
-          <ion-button fill="clear" color="danger" (click)="deletePlan(i)">
-            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-          </ion-button>
-        </ion-item>
-        <ion-item *ngIf="filteredFinancialPlans.length === 0">
-          <ion-label class="ion-text-center">ไม่มีข้อมูล</ion-label>
-        </ion-item>
-      </ion-list>
-    </ion-card-content>
-  </ion-card>
+      <div class="rec-stat-card rec-stat-green">
+        <div class="stat-icon"><ion-icon name="cash-outline"></ion-icon></div>
+        <div class="stat-info">
+          <div class="stat-value">{{ financialPlans.length }}</div>
+          <div class="stat-label">งบจัดสรร</div>
+        </div>
+      </div>
+    </div>
 
-  <ion-text color="medium" *ngIf="savedEntries.length === 0 && financialPlans.length === 0">
-    <p class="ion-text-center">ไม่มีข้อมูลแผนการเงินและงบจัดสรร</p>
-  </ion-text>
+    <!-- Year Filter -->
+    <div class="rec-filter-bar">
+      <ion-icon name="funnel-outline"></ion-icon>
+      <span class="filter-label">กรองตามปี:</span>
+      <ion-select
+        [(ngModel)]="selectedYear"
+        placeholder="ทุกปี"
+        interface="popover"
+        class="rec-year-select"
+      >
+        <ion-select-option *ngFor="let year of recordYears" [value]="year">
+          พ.ศ. {{ getBuddhistYear(year) }}
+        </ion-select-option>
+      </ion-select>
+      <button *ngIf="selectedYear" class="rec-clear-btn" (click)="clearYearFilter()">
+        <ion-icon name="close-circle"></ion-icon>
+        ล้างตัวกรอง
+      </button>
+    </div>
 
-  <!-- ฟอร์มอัปโหลดไฟล์ CSV -->
-  <!--<div style="margin-top: 32px; max-width: 400px; margin-left: auto; margin-right: auto;">
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>นำเข้าไฟล์ CSV</ion-card-title>
+    <!-- Section: แผนการเงิน -->
+    <ion-card class="rec-card">
+      <ion-card-header (click)="showRecords = !showRecords" class="rec-card-header">
+        <ion-card-title>
+          <ion-icon name="document-text-outline" style="color: #0077b6;"></ion-icon>
+          แผนการเงิน
+          <span class="rec-count-badge">{{ filteredSavedEntries.length }}</span>
+        </ion-card-title>
+        <ion-icon [name]="showRecords ? 'chevron-up-outline' : 'chevron-down-outline'" class="rec-chevron"></ion-icon>
       </ion-card-header>
-      <ion-card-content>
-        <input type="file" accept=".csv" (change)="onFileSelected($event)">
+
+      <ion-card-content *ngIf="showRecords" class="rec-card-body">
+        <div *ngIf="filteredSavedEntries.length === 0" class="rec-empty">
+          <ion-icon name="document-outline"></ion-icon>
+          <span>ไม่มีข้อมูล</span>
+        </div>
+        <div class="rec-list">
+          <div class="rec-item" *ngFor="let entry of filteredSavedEntries; let i = index">
+            <div class="rec-item-icon blue-icon">
+              <ion-icon name="document-text-outline"></ion-icon>
+            </div>
+            <div class="rec-item-body">
+              <div class="rec-item-title">{{ entry.itemName || ('รายการที่ ' + (i + 1)) }}</div>
+              <div class="rec-item-meta">
+                <span><strong>เบิก:</strong> {{ entry.withdraw }} บาท</span>
+                <span><strong>ประเภท:</strong> {{ entry.withdrawType }}</span>
+                <span><strong>วันที่:</strong> {{ getBuddhistDate(entry.date) }}</span>
+              </div>
+            </div>
+            <button class="rec-delete-btn" (click)="deleteEntry(i)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
+          </div>
+        </div>
       </ion-card-content>
     </ion-card>
-  </div>-->
 
-  <!-- ตารางแสดงข้อมูล (ใหม่) -->
-  <table *ngIf="tableData.length">
-    <thead>
-      <tr>
-        <th *ngFor="let key of tableData[0] | keyvalue">{{ key.key }}</th>
-      </tr>
-    </thead>
-  </table>
+    <!-- Section: งบจัดสรร -->
+    <ion-card class="rec-card">
+      <ion-card-header (click)="showPlans = !showPlans" class="rec-card-header">
+        <ion-card-title>
+          <ion-icon name="cash-outline" style="color: #06d6a0;"></ion-icon>
+          งบจัดสรร
+          <span class="rec-count-badge green-badge">{{ filteredFinancialPlans.length }}</span>
+        </ion-card-title>
+        <ion-icon [name]="showPlans ? 'chevron-up-outline' : 'chevron-down-outline'" class="rec-chevron"></ion-icon>
+      </ion-card-header>
+
+      <ion-card-content *ngIf="showPlans" class="rec-card-body">
+        <div *ngIf="filteredFinancialPlans.length === 0" class="rec-empty">
+          <ion-icon name="cash-outline"></ion-icon>
+          <span>ไม่มีข้อมูล</span>
+        </div>
+        <div class="rec-list">
+          <div class="rec-item" *ngFor="let plan of filteredFinancialPlans; let i = index">
+            <div class="rec-item-icon green-icon">
+              <ion-icon name="cash-outline"></ion-icon>
+            </div>
+            <div class="rec-item-body">
+              <div class="rec-item-title">ปีงบประมาณ พ.ศ. {{ getBuddhistYear(plan.date) }}</div>
+              <div class="rec-item-meta">
+                <span><strong>งบตั้งต้น:</strong> {{ plan.name | number:'1.2-2' }} บาท</span>
+                <span class="rec-remaining" [class.overspent]="getRemainingBudget(plan) < 0">
+                  <strong>งบคงเหลือ:</strong> {{ getRemainingBudget(plan) | number:'1.2-2' }} บาท
+                </span>
+              </div>
+              <!-- Spent Progress Bar (Point 3) -->
+              <div class="rec-progress-wrapper" *ngIf="plan.name">
+                <div class="rec-progress-bar">
+                  <div class="rec-progress-fill" 
+                    [style.width.%]="getSpentPercentage(plan)"
+                    [class.fill-danger]="getSpentPercentage(plan) > 100"
+                    [class.fill-warning]="getSpentPercentage(plan) > 85 && getSpentPercentage(plan) <= 100"
+                  ></div>
+                </div>
+                <span class="rec-progress-label">ใช้จ่ายไปแล้ว {{ getSpentPercentage(plan) | number:'1.0-1' }}%</span>
+              </div>
+            </div>
+            <button class="rec-delete-btn" (click)="deletePlan(i)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- All empty state -->
+    <div class="rec-all-empty" *ngIf="savedEntries.length === 0 && financialPlans.length === 0">
+      <ion-icon name="folder-open-outline"></ion-icon>
+      <p>ยังไม่มีข้อมูลในระบบ<br>กรุณาเพิ่มข้อมูลแผนการเงินและงบจัดสรร</p>
+    </div>
+
+  </div>
 </ion-content>

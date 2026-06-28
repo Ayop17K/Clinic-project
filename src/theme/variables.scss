@@ -1,2 +1,95 @@
-// For information on how to create your own theme, please see:
-// http://ionicframework.com/docs/theming/
+// Ionic Variables and Theming
+// https://ionicframework.com/docs/theming/
+
+:root {
+  // ---- Primary (Deep Navy Blue) ----
+  --ion-color-primary: #0f4c81;
+  --ion-color-primary-rgb: 15, 76, 129;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #0d4372;
+  --ion-color-primary-tint: #275e8e;
+
+  // ---- Secondary (Teal/Cyan) ----
+  --ion-color-secondary: #00b4d8;
+  --ion-color-secondary-rgb: 0, 180, 216;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #009ebd;
+  --ion-color-secondary-tint: #1abcdc;
+
+  // ---- Tertiary (Medium Blue) ----
+  --ion-color-tertiary: #0077b6;
+  --ion-color-tertiary-rgb: 0, 119, 182;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #0069a0;
+  --ion-color-tertiary-tint: #1a85bd;
+
+  // ---- Success (Mint Green) ----
+  --ion-color-success: #06d6a0;
+  --ion-color-success-rgb: 6, 214, 160;
+  --ion-color-success-contrast: #003426;
+  --ion-color-success-contrast-rgb: 0, 52, 38;
+  --ion-color-success-shade: #05bc8d;
+  --ion-color-success-tint: #1fdaaa;
+
+  // ---- Warning (Golden) ----
+  --ion-color-warning: #ffd60a;
+  --ion-color-warning-rgb: 255, 214, 10;
+  --ion-color-warning-contrast: #1a1a2e;
+  --ion-color-warning-contrast-rgb: 26, 26, 46;
+  --ion-color-warning-shade: #e0bc09;
+  --ion-color-warning-tint: #ffda23;
+
+  // ---- Danger (Coral Red) ----
+  --ion-color-danger: #ef476f;
+  --ion-color-danger-rgb: 239, 71, 111;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #d23f62;
+  --ion-color-danger-tint: #f15979;
+
+  // ---- Light ----
+  --ion-color-light: #f0f4f8;
+  --ion-color-light-rgb: 240, 244, 248;
+  --ion-color-light-contrast: #1a1a2e;
+  --ion-color-light-contrast-rgb: 26, 26, 46;
+  --ion-color-light-shade: #d4d8db;
+  --ion-color-light-tint: #f2f5f9;
+
+  // ---- Medium ----
+  --ion-color-medium: #64748b;
+  --ion-color-medium-rgb: 100, 116, 139;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #58657a;
+  --ion-color-medium-tint: #748297;
+
+  // ---- Dark ----
+  --ion-color-dark: #1a1a2e;
+  --ion-color-dark-rgb: 26, 26, 46;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #161628;
+  --ion-color-dark-tint: #313143;
+
+  // ---- App-level tokens ----
+  --ion-background-color: #f0f4f8;
+  --ion-background-color-rgb: 240, 244, 248;
+  --ion-text-color: #1a1a2e;
+  --ion-text-color-rgb: 26, 26, 46;
+  --ion-font-family: 'Sarabun', 'Noto Sans Thai', sans-serif;
+  --ion-toolbar-background: #0f4c81;
+  --ion-toolbar-color: #ffffff;
+
+  // ---- Custom Design Tokens ----
+  --clinic-card-radius: 16px;
+  --clinic-input-radius: 12px;
+  --clinic-shadow-sm: 0 2px 8px rgba(15, 76, 129, 0.08);
+  --clinic-shadow-md: 0 4px 20px rgba(15, 76, 129, 0.12);
+  --clinic-shadow-lg: 0 8px 32px rgba(15, 76, 129, 0.16);
+  --clinic-border: 1px solid rgba(15, 76, 129, 0.12);
+  --clinic-surface: #ffffff;
+  --clinic-surface-2: #f8fafc;
+}

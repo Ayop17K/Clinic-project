@@ -1,13 +1,10 @@
 /*
  * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
+ * Clinic Budget Management System — โรงพยาบาลส่งเสริมสุขภาพตำบลหนองปลิง
  */
+
+/* Google Fonts — Sarabun (Thai + Latin) */
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap');
 
 /* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
@@ -18,20 +15,146 @@
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
 
-/* Optional CSS utils that can be commented out */
+/* Optional CSS utils */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
+/* Theme variables */
+@import "./theme/variables.scss";
 
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+/* ============================================================
+   GLOBAL BASE STYLES
+   ============================================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+body, ion-app, ion-content {
+  font-family: 'Sarabun', 'Noto Sans Thai', sans-serif !important;
+}
+
+ion-content {
+  --background: #f0f4f8;
+}
+
+/* ---- Toolbar ---- */
+ion-toolbar {
+  --background: #0f4c81;
+  --color: #ffffff;
+  --min-height: 58px;
+}
+
+ion-title {
+  font-family: 'Sarabun', sans-serif !important;
+  font-weight: 700;
+  font-size: 1.1em;
+  letter-spacing: 0.2px;
+}
+
+/* ---- Cards ---- */
+ion-card {
+  border-radius: var(--clinic-card-radius) !important;
+  box-shadow: var(--clinic-shadow-md) !important;
+  border: var(--clinic-border);
+  background: var(--clinic-surface);
+  margin: 12px 0;
+}
+
+ion-card-header {
+  padding: 20px 20px 12px 20px;
+}
+
+ion-card-content {
+  padding: 12px 20px 20px 20px;
+}
+
+ion-card-title {
+  font-size: 1.1em !important;
+  font-weight: 700 !important;
+  color: #0f4c81;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---- Items / Inputs ---- */
+ion-item {
+  --border-radius: var(--clinic-input-radius);
+  --background: #ffffff;
+  --color: #1a1a2e;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --min-height: 54px;
+  font-family: 'Sarabun', sans-serif !important;
+}
+
+ion-label {
+  font-family: 'Sarabun', sans-serif !important;
+  font-weight: 500;
+}
+
+ion-input {
+  font-family: 'Sarabun', sans-serif !important;
+  font-size: 1em;
+}
+
+ion-select {
+  font-family: 'Sarabun', sans-serif !important;
+}
+
+/* ---- Buttons ---- */
+ion-button {
+  font-family: 'Sarabun', sans-serif !important;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: none;
+  --border-radius: 10px;
+}
+
+/* ---- List ---- */
+ion-list {
+  background: transparent !important;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f0f4f8;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb {
+  background: #00b4d8;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0f4c81;
+}
+
+/* ---- Table base ---- */
+table {
+  font-family: 'Sarabun', sans-serif !important;
+  border-collapse: collapse;
+}
+
+/* ---- Toast ---- */
+ion-toast {
+  font-family: 'Sarabun', sans-serif !important;
+  --border-radius: 12px;
+}
+
+/* ---- Alert ---- */
+ion-alert {
+  font-family: 'Sarabun', sans-serif !important;
+}
+
+/* ============================================================
+   DARK MODE (system)
+   ============================================================ */
 @import "@ionic/angular/css/palettes/dark.system.css";

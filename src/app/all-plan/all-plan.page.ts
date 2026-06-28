@@ -718,6 +718,15 @@ export class AllPlanPage implements OnInit {
       this.clearAll();
     }
   }
+  getAllocatedBudget(): number {
+    const plans = JSON.parse(localStorage.getItem('financial_plans') || '[]');
+    const plan = plans.find((p: any) => {
+      const pYear = p.date && p.date.length >= 4 ? p.date.slice(0, 4) : p.date;
+      return pYear === this.planYear;
+    });
+    return plan ? parseFloat(plan.name) || 0 : 0;
+  }
+
   ngOnInit() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (!user || !user.isAdmin) {

@@ -1,921 +1,241 @@
+<!-- All Plan Page — กรอกแผนการใช้จ่าย -->
 
 <ion-header [translucent]="true">
-  <ion-toolbar style="
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.25);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  ">
+  <ion-toolbar class="ap-toolbar">
     <ion-buttons slot="start">
-      <ion-button (click)="goBack()" fill="clear" style="
-        --color: white;
-        --border-radius: 12px;
-        backdrop-filter: blur(10px);
-        background: rgba(255, 255, 255, 0.1);
-        margin: 8px;
-        transition: all 0.3s ease;
-      ">
-        <ion-icon name="arrow-back-outline" slot="icon-only" style="color: #000;"></ion-icon>
+      <ion-button (click)="goBack()" fill="clear" class="back-btn">
+        <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title style="
-  font-size: 1.1em; 
-  letter-spacing: 0.5px;
-  color: white;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-">
-  <span style="display: flex; align-items: center; gap: 8px;">
-    <ion-icon
-      name="analytics-outline"
-      style="font-size: 1.4em; color: #ffd700;"
-    ></ion-icon>
-    <span style="font-weight: 600; color: #000;">
-      แผนการใช้จ่ายเงินบำรุงโรงพยาบาล
-    </span>
-  </span>
-
-  <span style="font-size: 0.85em; color: #000; opacity: 1;">
-    และหน่วยบริการสาธารณสุข
-  </span>
-</ion-title>
+    <ion-title>
+      <div class="ap-title-wrap">
+        <ion-icon name="analytics-outline" class="ap-title-icon"></ion-icon>
+        <div>
+          <div class="ap-title-main">แผนการใช้จ่ายเงินบำรุงโรงพยาบาล</div>
+          <div class="ap-title-sub">และหน่วยบริการสาธารณสุข</div>
+        </div>
+      </div>
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding" style="
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-  min-height: 100vh;
-  position: relative;
-  overflow-x: hidden;
-">
-  <!-- Animated background elements -->
-  <div style="
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-      radial-gradient(circle at 60% 40%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 1;
-  "></div>
+<ion-content [fullscreen]="true" class="ap-content">
+  <div class="ap-container">
 
-  <!-- Main content container with glassmorphism -->
-  <div style="
-    position: relative;
-    z-index: 2;
-    background: rgba(245, 247, 250, 0.85);
-    backdrop-filter: blur(18px);
-    border-radius: 24px;
-    padding: 24px;
-    margin: 16px 0;
-    box-shadow: 
-      0 20px 40px rgba(0, 0, 0, 0.1),
-      0 8px 16px rgba(0, 0, 0, 0.05),
-      inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-  ">
+    <!-- Hospital Info -->
+    <div class="ap-hospital-bar">
+      <div class="ap-hospital-name">โรงพยาบาลส่งเสริมสุขภาพตำบลหนองปลิง อำเภอเมือง จังหวัดกำแพงเพชร</div>
+      <div class="ap-hospital-sub">สังกัด องค์การบริหารส่วนจังหวัดกำแพงเพชร</div>
+    </div>
 
-
-    <!-- Hospital Header Section -->
-    <div class="ion-text-center" style="margin-bottom: 24px;">
-      <div style="
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-size: 1.25em; 
-        font-weight: 700; 
-        letter-spacing: 0.3px;
-        margin-bottom: 8px;
-        text-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-      ">โรงพยาบาลส่งเสริมสุขภาพตำบลหนองปลิง อำเภอเมือง จังหวัดกำแพงเพชร
-      </div>
-      
-      <div style="
-        color: #6b7280; 
-        font-size: 1em; 
-        font-weight: 500;
-        margin-bottom: 16px;
-        opacity: 0.8;
-      ">สังกัด องค์การบริหารส่วนจังหวัดกำแพงเพชร</div>
-      
-      <!-- Year Selection with enhanced styling -->
-      <div style="
-        margin-bottom: 16px; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        gap: 12px;
-        flex-wrap: wrap;
-        background: rgba(102, 126, 234, 0.05);
-        padding: 16px 24px;
-        border-radius: 16px;
-        border: 1px solid rgba(102, 126, 234, 0.1);
-      ">
-        <strong style="
-          font-size: 1.2em; 
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          letter-spacing: 0.5px;
-        ">ประจำปีงบประมาณ พ.ศ.</strong>
-        
-        <ion-input type="text" [(ngModel)]="planYear" maxlength="4" style="
-          width: 80px; 
-          text-align: center; 
-          font-size: 1.2em; 
-          font-weight: bold;
-          background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
-          border-radius: 12px; 
-          border: 2px solid #667eea; 
-          padding: 8px 12px;
-          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-          transition: all 0.3s ease;
-          --color: #667eea;
-        " inputmode="numeric"></ion-input>
-        
-        <div style="
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
-          padding: 8px 16px;
-          border-radius: 12px;
-          border: 1px solid #f59e0b;
-          box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
-        ">
-          <ion-icon name="information-circle-outline" style="color: #92400e; font-size: 1.1em;"></ion-icon>
-          <span style="font-size: 0.9em; color: #92400e; font-weight: 500;">โปรดเลือกปีงบประมาณ</span>
+    <!-- Year Selection & Actions -->
+    <div class="ap-controls-card">
+      <div class="ap-year-row">
+        <div class="ap-year-group">
+          <label class="ap-year-label">
+            <ion-icon name="calendar-outline"></ion-icon>
+            ประจำปีงบประมาณ พ.ศ.
+          </label>
+          <ion-input
+            type="text"
+            [(ngModel)]="planYear"
+            maxlength="4"
+            class="ap-year-input"
+            inputmode="numeric"
+            placeholder="เช่น 2568"
+          ></ion-input>
+        </div>
+        <div class="ap-info-pill">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          <span>โปรดระบุปีงบประมาณ</span>
         </div>
       </div>
-      <!-- Enhanced Action Buttons -->
-      <div style="
-        display: flex; 
-        justify-content: center; 
-        gap: 12px; 
-        flex-wrap: wrap; 
-        align-items: center;
-        margin-bottom: 24px;
-      ">
-        <ion-button size="small" (click)="toggleAllSubRows()" style="
-          --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          --color: white;
-          --border-radius: 16px;
-          --box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
-          --padding-start: 20px;
-          --padding-end: 20px;
-          font-weight: 600;
-          letter-spacing: 0.3px;
-          transition: all 0.3s ease;
-          transform: translateY(0);
-        " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-          <ion-icon [name]="allSubRowsCollapsed ? 'chevron-down-outline' : 'chevron-up-outline'" slot="start"></ion-icon>
-          {{ allSubRowsCollapsed ? 'แสดงรายการย่อยทั้งหมด' : 'ซ่อนรายการย่อยทั้งหมด' }}
-        </ion-button>
-        
-        <ion-button size="small" (click)="goToPlanRecord()" style="
-          --background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-          --color: white;
-          --border-radius: 16px;
-          --box-shadow: 0 6px 20px rgba(6, 182, 212, 0.3);
-          --padding-start: 20px;
-          --padding-end: 20px;
-          font-weight: 600;
-          letter-spacing: 0.3px;
-          transition: all 0.3s ease;
-          transform: translateY(0);
-        " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-          <ion-icon name="document-text-outline" slot="start"></ion-icon>
-          ดูบันทึกแผน
-        </ion-button>
-        
-        <ion-button size="small" (click)="confirmClear()" style="
-          --background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
-          --color: white;
-          --border-radius: 16px;
-          --box-shadow: 0 6px 20px rgba(244, 63, 94, 0.3);
-          --padding-start: 20px;
-          --padding-end: 20px;
-          font-weight: 600;
-          letter-spacing: 0.3px;
-          transition: all 0.3s ease;
-          transform: translateY(0);
-        " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-          <ion-icon name="trash-outline" slot="start"></ion-icon>
-          ล้างข้อมูล
-        </ion-button>
-        
-        <ion-button size="small" (click)="saveData()" style="
-          --background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-          --color: white;
-          --border-radius: 16px;
-          --box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
-          --padding-start: 20px;
-          --padding-end: 20px;
-          font-weight: 600;
-          letter-spacing: 0.3px;
-          transition: all 0.3s ease;
-          transform: translateY(0);
-        " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-          <ion-icon name="save-outline" slot="start"></ion-icon>
-          บันทึก
-        </ion-button>
+
+      <!-- Budget Ceiling & Progress (Point 1 & 2) -->
+      <div class="ap-budget-ceiling-row" *ngIf="planYear">
+        <div class="ceiling-item">
+          <span class="label">งบจัดสรรตั้งต้น:</span>
+          <span class="value blue-val">{{ getAllocatedBudget() ? (getAllocatedBudget() | number:'1.2-2') + ' บาท' : 'ยังไม่ได้กำหนด' }}</span>
+        </div>
+        <div class="ceiling-item">
+          <span class="label">รวมแผนใช้จ่าย:</span>
+          <span class="value dark-val">{{ getSafeNumber(summary.total) | number:'1.2-2' }} บาท</span>
+        </div>
+        <div class="ceiling-item" [class.over-budget]="getAllocatedBudget() > 0 && getSafeNumber(summary.total) > getAllocatedBudget()">
+          <span class="label">งบคงเหลือ:</span>
+          <span class="value green-val">{{ (getAllocatedBudget() - getSafeNumber(summary.total)) | number:'1.2-2' }} บาท</span>
+        </div>
+        <div class="ceiling-warning" *ngIf="getAllocatedBudget() > 0 && getSafeNumber(summary.total) > getAllocatedBudget()">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>คำเตือน: แผนใช้จ่ายเกินงบจัดสรรที่ได้รับตั้งต้น!</span>
+        </div>
       </div>
 
+      <!-- Action Buttons -->
+      <div class="ap-action-row">
+        <button class="ap-btn ap-btn-secondary" (click)="toggleAllSubRows()">
+          <ion-icon [name]="allSubRowsCollapsed ? 'chevron-down-outline' : 'chevron-up-outline'"></ion-icon>
+          {{ allSubRowsCollapsed ? 'แสดงรายการย่อย' : 'ซ่อนรายการย่อย' }}
+        </button>
+        <button class="ap-btn ap-btn-teal" (click)="goToPlanRecord()">
+          <ion-icon name="document-text-outline"></ion-icon>
+          ดูบันทึกแผน
+        </button>
+        <button class="ap-btn ap-btn-danger" (click)="confirmClear()">
+          <ion-icon name="trash-outline"></ion-icon>
+          ล้างข้อมูล
+        </button>
+        <button class="ap-btn ap-btn-success" (click)="saveData()">
+          <ion-icon name="save-outline"></ion-icon>
+          บันทึก
+        </button>
+      </div>
+    </div>
 
-    <!-- Enhanced Table Container -->
-    <div style="
-      overflow-x: auto; 
-      overflow-y: auto; 
-      max-height: 75vh; 
-      border-radius: 24px; 
-      background: rgba(245, 247, 250, 0.85);
-      backdrop-filter: blur(10px);
-      box-shadow: 
-        0 25px 50px rgba(0, 0, 0, 0.15),
-        0 10px 20px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.55);
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      padding: 16px;
-      position: relative;
-    ">
-      <!-- Table with enhanced styling -->
-      <table style="
-        width: 100%; 
-        border-collapse: separate; 
-        border-spacing: 0; 
-        font-size: 0.95em; 
-        color: #1f2937; 
-        background: transparent;
-        border-radius: 16px; 
-        overflow: hidden;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-      ">
-        <thead>
-          <tr style="
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-bottom: 3px solid #553c9a;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-          ">
-            <th style="
-              border: 1px solid rgba(255, 255, 255, 0.2); 
-              padding: 16px 12px; 
-              font-weight: 600;
-              text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-              letter-spacing: 0.3px;
-            ">ลำดับที่</th>
-            <th style="
-              border: 1px solid rgba(255, 255, 255, 0.2); 
-              padding: 16px 12px; 
-              font-weight: 600;
-              text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-              letter-spacing: 0.3px;
-            ">รายการ</th>
-            <th style="
-              background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); 
-              color: #92400e; 
-              border: 1px solid rgba(245, 158, 11, 0.3); 
-              padding: 14px 12px;
-              font-weight: 700;
-              text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
-              letter-spacing: 0.3px;
-            ">งบประมาณ อปท.</th>
-            <th style="
-              background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); 
-              color: #92400e; 
-              border: 1px solid rgba(245, 158, 11, 0.3); 
-              padding: 14px 12px;
-              font-weight: 700;
-              text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
-              letter-spacing: 0.3px;
-            ">เงินบำรุง</th>
-            <th style="border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; font-weight: 600; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);">ต.ค.</th>
-            <th style="border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; font-weight: 600; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);">พ.ย.</th>
-            <th style="border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; font-weight: 600; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);">ธ.ค.</th>
-            <th style="border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; font-weight: 600; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);">ม.ค.</th>
-            <th style="border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; font-weight: 600; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);">ก.พ.</th>
-            <th style="border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; font-weight: 600; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);">มี.ค.</th>
-            <th style="border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; font-weight: 600; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);">เม.ย.</th>
-            <th style="border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; font-weight: 600; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);">พ.ค.</th>
-            <th style="border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; font-weight: 600; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);">มิ.ย.</th>
-            <th style="border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; font-weight: 600; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);">ก.ค.</th>
-            <th style="border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; font-weight: 600; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);">ส.ค.</th>
-            <th style="border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; font-weight: 600; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);">ก.ย.</th>
-            <th style="
-              border: 1px solid rgba(255, 255, 255, 0.2); 
-              padding: 12px; 
-              font-weight: 700; 
-              text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-              background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
-            ">รวม</th>
+    <!-- Keyboard hint -->
+    <div class="ap-hint-bar">
+      <ion-icon name="keypad-outline"></ion-icon>
+      <span>กด <kbd>Tab</kbd> เพื่อเลื่อนไปช่องถัดไป · กด <kbd>Enter</kbd> เพื่อบันทึก</span>
+    </div>
+
+    <!-- Table Container -->
+    <div class="ap-table-wrap">
+      <table class="ap-table">
+        <thead class="ap-thead">
+          <tr>
+            <th class="th-num">ลำดับ</th>
+            <th class="th-item">รายการ</th>
+            <th class="th-budget">งบประมาณ อปท.</th>
+            <th class="th-budget">เงินบำรุง</th>
+            <th class="th-month">ต.ค.</th>
+            <th class="th-month">พ.ย.</th>
+            <th class="th-month">ธ.ค.</th>
+            <th class="th-month">ม.ค.</th>
+            <th class="th-month">ก.พ.</th>
+            <th class="th-month">มี.ค.</th>
+            <th class="th-month">เม.ย.</th>
+            <th class="th-month">พ.ค.</th>
+            <th class="th-month">มิ.ย.</th>
+            <th class="th-month">ก.ค.</th>
+            <th class="th-month">ส.ค.</th>
+            <th class="th-month">ก.ย.</th>
+            <th class="th-total">รวม</th>
           </tr>
         </thead>
-      <tbody>
-        <ng-container *ngFor="let item of [
-            'ค่ายาและเวชภัณฑ์',
-            'ค่าวัสดุทางการแพทย์และวัสดุอื่นใดของโรงพยาบาลและหน่วยบริการสาธารณสุข',
-            'ค่าตอบแทนทางการแพทย์และฝ่ายสนับสนุนอื่น ๆ ซึ่งมิใช่ข้าราชการ ลูกจ้าง หรือพนักงานจ้างขององค์กรปกครองส่วนท้องถิ่น',
-            'ค่าตอบแทนทางการแพทย์ให้แก่หน่วยอื่น',
-            'ค่าครุภัณฑ์ ที่ดิน และสิ่งก่อสร้าง',
-            'ค่าใช้สอย',
-            'ค่าสาธารณูปโภค',
-            'ค่าจ้างลูกจ้างชั่วคราว',
-            'ค่าตอบแทนการปฏิบัติงานนอกเวลาราชการ',
-            'ค่าใช้จ่ายการเดินทางไปราชการ/ค่าใช้จ่ายในการเข้ารับการฝึกอบรม',
-            'ค่าใช้จ่ายอื่นที่จำเป็นที่เกี่ยวข้องกับการสาธารณสุข'
-          ]; let i = index">
-          <tr [ngClass]="i % 2 === 0 ? 'even-row' : 'odd-row'" class="main-row">
+        <tbody>
+          <ng-container *ngFor="let item of [
+              'ค่ายาและเวชภัณฑ์',
+              'ค่าวัสดุทางการแพทย์และวัสดุอื่นใดของโรงพยาบาลและหน่วยบริการสาธารณสุข',
+              'ค่าตอบแทนทางการแพทย์และฝ่ายสนับสนุนอื่น ๆ ซึ่งมิใช่ข้าราชการ ลูกจ้าง หรือพนักงานจ้างขององค์กรปกครองส่วนท้องถิ่น',
+              'ค่าตอบแทนทางการแพทย์ให้แก่หน่วยอื่น',
+              'ค่าครุภัณฑ์ ที่ดิน และสิ่งก่อสร้าง',
+              'ค่าใช้สอย',
+              'ค่าสาธารณูปโภค',
+              'ค่าจ้างลูกจ้างชั่วคราว',
+              'ค่าตอบแทนการปฏิบัติงานนอกเวลาราชการ',
+              'ค่าใช้จ่ายการเดินทางไปราชการ/ค่าใช้จ่ายในการเข้ารับการฝึกอบรม',
+              'ค่าใช้จ่ายอื่นที่จำเป็นที่เกี่ยวข้องกับการสาธารณสุข'
+            ]; let i = index">
 
-            <!-- Enhanced Main row -->
-            <td class="row-number-cell">
-              <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
-                <span style="font-size: 1.1em; text-shadow: 0 1px 2px rgba(102, 126, 234, 0.2);">{{ i + 1 }}</span>
-                <ion-button fill="clear" size="small" color="medium" (click)="planRows[i].subRowsCollapsed = !planRows[i].subRowsCollapsed" class="expand-button">
-                  <ion-icon [name]="planRows[i].subRowsCollapsed ? 'chevron-down-outline' : 'chevron-up-outline'" slot="icon-only" style="font-size: 1.2em;"></ion-icon>
-                </ion-button>
-              </div>
-            </td>
-            <td style="
-              border: 1px solid rgba(102, 126, 234, 0.1); 
-              padding: 12px 10px; 
-              color: #1f2937; 
-              font-weight: 600; 
-              min-width: 120px; 
-              max-width: 320px; 
-              white-space: pre-line; 
-              word-break: break-word;
-              background: rgba(255, 255, 255, 0.7);
-              border-radius: 8px;
-            ">
-              <span style="line-height: 1.4; letter-spacing: 0.2px;">{{ item }}</span>
-            </td>
-            <td style="
-              background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%); 
-              border: 1px solid rgba(245, 158, 11, 0.2); 
-              padding: 12px 10px; 
-              text-align: right; 
-              color: #92400e; 
-              font-weight: 600;
-              border-radius: 8px;
-            ">
-              <span *ngIf="i !== 3" style="text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">{{ getSafeNumber(planRows[i]?.budget_op) ? (getSafeNumber(planRows[i]?.budget_op) | number:'1.2-2') : '-' }}</span>
-              <ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].budget_op" (ngModelChange)="calculateRowTotal(planRows[i])" style="
-                width: 100%; 
-                text-align: right; 
-                font-weight: 600; 
-                color: #92400e;
-                --background: rgba(255, 255, 255, 0.3);
-                --border-radius: 6px;
-              "></ion-input>
-            </td>
-            <td style="
-              background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%); 
-              border: 1px solid rgba(102, 126, 234, 0.2); 
-              padding: 12px 10px; 
-              text-align: right; 
-              color: #553c9a; 
-              font-weight: 600;
-              border-radius: 8px;
-            ">
-              <span *ngIf="i !== 3" style="text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">{{ getSafeNumber(planRows[i]?.budget_fund) ? (getSafeNumber(planRows[i]?.budget_fund) | number:'1.2-2') : '-' }}</span>
-              <ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].budget_fund" (ngModelChange)="calculateRowTotal(planRows[i])" style="
-                width: 100%; 
-                text-align: right; 
-                font-weight: 600; 
-                color: #553c9a;
-                --background: rgba(255, 255, 255, 0.3);
-                --border-radius: 6px;
-              "></ion-input>
-            </td>
-            <td style="border: 1px solid rgba(102, 126, 234, 0.1); padding: 10px; text-align: right; background: rgba(255, 255, 255, 0.6); border-radius: 6px;">
-              <span *ngIf="i !== 3" style="color: #374151; font-weight: 500;">{{ getSafeNumber(planRows[i]?.oct) ? (getSafeNumber(planRows[i]?.oct) | number:'1.2-2') : '-' }}</span>
-              <ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].oct" (ngModelChange)="calculateRowTotal(planRows[i])" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.8); --border-radius: 4px;"></ion-input>
-            </td>
-            <td style="border: 1px solid rgba(102, 126, 234, 0.1); padding: 10px; text-align: right; background: rgba(255, 255, 255, 0.6); border-radius: 6px;">
-              <span *ngIf="i !== 3" style="color: #374151; font-weight: 500;">{{ getSafeNumber(planRows[i]?.nov) ? (getSafeNumber(planRows[i]?.nov) | number:'1.2-2') : '-' }}</span>
-              <ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].nov" (ngModelChange)="calculateRowTotal(planRows[i])" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.8); --border-radius: 4px;"></ion-input>
-            </td>
-            <td style="border: 1px solid rgba(102, 126, 234, 0.1); padding: 10px; text-align: right; background: rgba(255, 255, 255, 0.6); border-radius: 6px;">
-              <span *ngIf="i !== 3" style="color: #374151; font-weight: 500;">{{ getSafeNumber(planRows[i]?.dec) ? (getSafeNumber(planRows[i]?.dec) | number:'1.2-2') : '-' }}</span>
-              <ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].dec" (ngModelChange)="calculateRowTotal(planRows[i])" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.8); --border-radius: 4px;"></ion-input>
-            </td>
-            <td style="border: 1px solid rgba(102, 126, 234, 0.1); padding: 10px; text-align: right; background: rgba(255, 255, 255, 0.6); border-radius: 6px;">
-              <span *ngIf="i !== 3" style="color: #374151; font-weight: 500;">{{ getSafeNumber(planRows[i]?.jan) ? (getSafeNumber(planRows[i]?.jan) | number:'1.2-2') : '-' }}</span>
-              <ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].jan" (ngModelChange)="calculateRowTotal(planRows[i])" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.8); --border-radius: 4px;"></ion-input>
-            </td>
-            <td style="border: 1px solid rgba(102, 126, 234, 0.1); padding: 10px; text-align: right; background: rgba(255, 255, 255, 0.6); border-radius: 6px;">
-              <span *ngIf="i !== 3" style="color: #374151; font-weight: 500;">{{ getSafeNumber(planRows[i]?.feb) ? (getSafeNumber(planRows[i]?.feb) | number:'1.2-2') : '-' }}</span>
-              <ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].feb" (ngModelChange)="calculateRowTotal(planRows[i])" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.8); --border-radius: 4px;"></ion-input>
-            </td>
-            <td style="border: 1px solid rgba(102, 126, 234, 0.1); padding: 10px; text-align: right; background: rgba(255, 255, 255, 0.6); border-radius: 6px;">
-              <span *ngIf="i !== 3" style="color: #374151; font-weight: 500;">{{ getSafeNumber(planRows[i]?.mar) ? (getSafeNumber(planRows[i]?.mar) | number:'1.2-2') : '-' }}</span>
-              <ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].mar" (ngModelChange)="calculateRowTotal(planRows[i])" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.8); --border-radius: 4px;"></ion-input>
-            </td>
-            <td style="border: 1px solid rgba(102, 126, 234, 0.1); padding: 10px; text-align: right; background: rgba(255, 255, 255, 0.6); border-radius: 6px;">
-              <span *ngIf="i !== 3" style="color: #374151; font-weight: 500;">{{ getSafeNumber(planRows[i]?.apr) ? (getSafeNumber(planRows[i]?.apr) | number:'1.2-2') : '-' }}</span>
-              <ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].apr" (ngModelChange)="calculateRowTotal(planRows[i])" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.8); --border-radius: 4px;"></ion-input>
-            </td>
-            <td style="border: 1px solid rgba(102, 126, 234, 0.1); padding: 10px; text-align: right; background: rgba(255, 255, 255, 0.6); border-radius: 6px;">
-              <span *ngIf="i !== 3" style="color: #374151; font-weight: 500;">{{ getSafeNumber(planRows[i]?.may) ? (getSafeNumber(planRows[i]?.may) | number:'1.2-2') : '-' }}</span>
-              <ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].may" (ngModelChange)="calculateRowTotal(planRows[i])" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.8); --border-radius: 4px;"></ion-input>
-            </td>
-            <td style="border: 1px solid rgba(102, 126, 234, 0.1); padding: 10px; text-align: right; background: rgba(255, 255, 255, 0.6); border-radius: 6px;">
-              <span *ngIf="i !== 3" style="color: #374151; font-weight: 500;">{{ getSafeNumber(planRows[i]?.jun) ? (getSafeNumber(planRows[i]?.jun) | number:'1.2-2') : '-' }}</span>
-              <ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].jun" (ngModelChange)="calculateRowTotal(planRows[i])" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.8); --border-radius: 4px;"></ion-input>
-            </td>
-            <td style="border: 1px solid rgba(102, 126, 234, 0.1); padding: 10px; text-align: right; background: rgba(255, 255, 255, 0.6); border-radius: 6px;">
-              <span *ngIf="i !== 3" style="color: #374151; font-weight: 500;">{{ getSafeNumber(planRows[i]?.jul) ? (getSafeNumber(planRows[i]?.jul) | number:'1.2-2') : '-' }}</span>
-              <ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].jul" (ngModelChange)="calculateRowTotal(planRows[i])" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.8); --border-radius: 4px;"></ion-input>
-            </td>
-            <td style="border: 1px solid rgba(102, 126, 234, 0.1); padding: 10px; text-align: right; background: rgba(255, 255, 255, 0.6); border-radius: 6px;">
-              <span *ngIf="i !== 3" style="color: #374151; font-weight: 500;">{{ getSafeNumber(planRows[i]?.aug) ? (getSafeNumber(planRows[i]?.aug) | number:'1.2-2') : '-' }}</span>
-              <ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].aug" (ngModelChange)="calculateRowTotal(planRows[i])" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.8); --border-radius: 4px;"></ion-input>
-            </td>
-            <td style="border: 1px solid rgba(102, 126, 234, 0.1); padding: 10px; text-align: right; background: rgba(255, 255, 255, 0.6); border-radius: 6px;">
-              <span *ngIf="i !== 3" style="color: #374151; font-weight: 500;">{{ getSafeNumber(planRows[i]?.sep) ? (getSafeNumber(planRows[i]?.sep) | number:'1.2-2') : '-' }}</span>
-              <ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].sep" (ngModelChange)="calculateRowTotal(planRows[i])" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.8); --border-radius: 4px;"></ion-input>
-            </td>
-            <td style="
-              border: 1px solid rgba(102, 126, 234, 0.2); 
-              padding: 12px 10px; 
-              text-align: right; 
-              font-weight: 700; 
-              color: #667eea; 
-              background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(255, 255, 255, 0.8) 100%);
-              border-radius: 8px;
-              text-shadow: 0 1px 2px rgba(102, 126, 234, 0.2);
-            ">
-              {{ getSafeNumber(planRows[i]?.total) ? (getSafeNumber(planRows[i]?.total) | number:'1.2-2') : '-' }}
-            </td>
-          </tr>
+            <!-- MAIN ROW -->
+            <tr class="ap-main-row" [class.ap-row-even]="i % 2 === 0">
+              <td class="td-num">
+                <span class="row-num">{{ i + 1 }}</span>
+                <button type="button" class="expand-btn"
+                  (click)="planRows[i].subRowsCollapsed = !planRows[i].subRowsCollapsed">
+                  <ion-icon [name]="planRows[i].subRowsCollapsed ? 'chevron-down-outline' : 'chevron-up-outline'"></ion-icon>
+                </button>
+              </td>
+              <td class="td-item">{{ item }}</td>
 
-          <!-- Enhanced Sub-rows for each row -->
-          <ng-container *ngIf="planRows[i]?.subRows && !planRows[i].subRowsCollapsed">
-            <ng-container *ngFor="let sub of planRows[i]?.subRows; let si = index">
-              <tr *ngIf="!sub.hidden" style="
-                background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-                transition: all 0.3s ease;
-                opacity: 0.95;
-              " onmouseover="this.style.background='linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)'; this.style.opacity='1'" onmouseout="this.style.background='linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)'; this.style.opacity='0.95'">
-                <td style="
-                  border: 1px solid rgba(245, 158, 11, 0.3); 
-                  text-align: center; 
-                  padding: 10px;
-                  font-weight: 600;
-                  color: #92400e;
-                  background: rgba(254, 243, 199, 0.8);
-                  border-radius: 6px;
-                ">{{ i + 1 }}.{{ si + 1 }}</td>
-                <td style="
-                  border: 1px solid rgba(245, 158, 11, 0.3); 
-                  color: #92400e; 
-                  padding: 12px 10px;
-                  background: rgba(255, 255, 255, 0.4);
-                  border-radius: 6px;
-                ">
-                  <span style="font-weight: 600; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">{{ sub.name }}</span>
-                </td>
-                <td style="border: 1px solid rgba(245, 158, 11, 0.3); text-align: right; padding: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 4px;">
-                  <ion-input type="number" [(ngModel)]="sub.budget_op" (ngModelChange)="calculateMainRowFromSubRows(i)" style="
-                    width: 100%; 
-                    text-align: right;
-                    --background: rgba(255, 255, 255, 0.6);
-                    --border-radius: 4px;
-                    --color: #92400e;
-                    font-weight: 500;
-                  "></ion-input>
-                </td>
-                <td style="border: 1px solid rgba(245, 158, 11, 0.3); text-align: right; padding: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 4px;">
-                  <ion-input type="number" [(ngModel)]="sub.budget_fund" (ngModelChange)="calculateMainRowFromSubRows(i)" style="
-                    width: 100%; 
-                    text-align: right;
-                    --background: rgba(255, 255, 255, 0.6);
-                    --border-radius: 4px;
-                    --color: #92400e;
-                    font-weight: 500;
-                  "></ion-input>
-                </td>
-                <td style="border: 1px solid rgba(245, 158, 11, 0.3); text-align: right; padding: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 4px;">
-                  <ion-input type="number" [(ngModel)]="sub.oct" (ngModelChange)="calculateSubRowTotal(sub, i)" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.6); --border-radius: 4px; --color: #92400e;"></ion-input>
-                </td>
-                <td style="border: 1px solid rgba(245, 158, 11, 0.3); text-align: right; padding: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 4px;">
-                  <ion-input type="number" [(ngModel)]="sub.nov" (ngModelChange)="calculateSubRowTotal(sub, i)" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.6); --border-radius: 4px; --color: #92400e;"></ion-input>
-                </td>
-                <td style="border: 1px solid rgba(245, 158, 11, 0.3); text-align: right; padding: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 4px;">
-                  <ion-input type="number" [(ngModel)]="sub.dec" (ngModelChange)="calculateSubRowTotal(sub, i)" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.6); --border-radius: 4px; --color: #92400e;"></ion-input>
-                </td>
-                <td style="border: 1px solid rgba(245, 158, 11, 0.3); text-align: right; padding: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 4px;">
-                  <ion-input type="number" [(ngModel)]="sub.jan" (ngModelChange)="calculateSubRowTotal(sub, i)" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.6); --border-radius: 4px; --color: #92400e;"></ion-input>
-                </td>
-                <td style="border: 1px solid rgba(245, 158, 11, 0.3); text-align: right; padding: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 4px;">
-                  <ion-input type="number" [(ngModel)]="sub.feb" (ngModelChange)="calculateSubRowTotal(sub, i)" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.6); --border-radius: 4px; --color: #92400e;"></ion-input>
-                </td>
-                <td style="border: 1px solid rgba(245, 158, 11, 0.3); text-align: right; padding: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 4px;">
-                  <ion-input type="number" [(ngModel)]="sub.mar" (ngModelChange)="calculateSubRowTotal(sub, i)" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.6); --border-radius: 4px; --color: #92400e;"></ion-input>
-                </td>
-                <td style="border: 1px solid rgba(245, 158, 11, 0.3); text-align: right; padding: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 4px;">
-                  <ion-input type="number" [(ngModel)]="sub.apr" (ngModelChange)="calculateSubRowTotal(sub, i)" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.6); --border-radius: 4px; --color: #92400e;"></ion-input>
-                </td>
-                <td style="border: 1px solid rgba(245, 158, 11, 0.3); text-align: right; padding: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 4px;">
-                  <ion-input type="number" [(ngModel)]="sub.may" (ngModelChange)="calculateSubRowTotal(sub, i)" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.6); --border-radius: 4px; --color: #92400e;"></ion-input>
-                </td>
-                <td style="border: 1px solid rgba(245, 158, 11, 0.3); text-align: right; padding: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 4px;">
-                  <ion-input type="number" [(ngModel)]="sub.jun" (ngModelChange)="calculateSubRowTotal(sub, i)" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.6); --border-radius: 4px; --color: #92400e;"></ion-input>
-                </td>
-                <td style="border: 1px solid rgba(245, 158, 11, 0.3); text-align: right; padding: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 4px;">
-                  <ion-input type="number" [(ngModel)]="sub.jul" (ngModelChange)="calculateSubRowTotal(sub, i)" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.6); --border-radius: 4px; --color: #92400e;"></ion-input>
-                </td>
-                <td style="border: 1px solid rgba(245, 158, 11, 0.3); text-align: right; padding: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 4px;">
-                  <ion-input type="number" [(ngModel)]="sub.aug" (ngModelChange)="calculateSubRowTotal(sub, i)" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.6); --border-radius: 4px; --color: #92400e;"></ion-input>
-                </td>
-                <td style="border: 1px solid rgba(245, 158, 11, 0.3); text-align: right; padding: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 4px;">
-                  <ion-input type="number" [(ngModel)]="sub.sep" (ngModelChange)="calculateSubRowTotal(sub, i)" style="width: 100%; text-align: right; --background: rgba(255, 255, 255, 0.6); --border-radius: 4px; --color: #92400e;"></ion-input>
-                </td>
-                <td style="
-                  border: 1px solid rgba(245, 158, 11, 0.3); 
-                  text-align: right; 
-                  font-weight: 700; 
-                  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-                  color: white;
-                  padding: 10px 8px;
-                  border-radius: 6px;
-                  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-                ">
-                  <ion-input type="number" [value]="sub.total" readonly style="
-                    width: 100%; 
-                    text-align: right; 
-                    font-weight: 700; 
-                    --background: transparent;
-                    --color: white;
-                    pointer-events: none;
-                  "></ion-input>
-                </td>
-                
-              </tr>
+              <!-- budget_op: editable only for row 3 (index 3), else display -->
+              <td class="td-budget-op">
+                <span *ngIf="i !== 3">{{ getSafeNumber(planRows[i]?.budget_op) ? (getSafeNumber(planRows[i]?.budget_op) | number:'1.2-2') : '-' }}</span>
+                <ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].budget_op"
+                  (ngModelChange)="calculateRowTotal(planRows[i])" class="ap-cell-input" inputmode="decimal"></ion-input>
+              </td>
+
+              <!-- budget_fund: editable only for row 3 -->
+              <td class="td-budget-fund">
+                <span *ngIf="i !== 3">{{ getSafeNumber(planRows[i]?.budget_fund) ? (getSafeNumber(planRows[i]?.budget_fund) | number:'1.2-2') : '-' }}</span>
+                <ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].budget_fund"
+                  (ngModelChange)="calculateRowTotal(planRows[i])" class="ap-cell-input" inputmode="decimal"></ion-input>
+              </td>
+
+              <!-- Monthly columns — display for non-editable rows -->
+              <td class="td-month"><span *ngIf="i !== 3">{{ getSafeNumber(planRows[i]?.oct) ? (getSafeNumber(planRows[i]?.oct) | number:'1.2-2') : '-' }}</span><ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].oct" (ngModelChange)="calculateRowTotal(planRows[i])" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+              <td class="td-month"><span *ngIf="i !== 3">{{ getSafeNumber(planRows[i]?.nov) ? (getSafeNumber(planRows[i]?.nov) | number:'1.2-2') : '-' }}</span><ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].nov" (ngModelChange)="calculateRowTotal(planRows[i])" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+              <td class="td-month"><span *ngIf="i !== 3">{{ getSafeNumber(planRows[i]?.dec) ? (getSafeNumber(planRows[i]?.dec) | number:'1.2-2') : '-' }}</span><ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].dec" (ngModelChange)="calculateRowTotal(planRows[i])" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+              <td class="td-month"><span *ngIf="i !== 3">{{ getSafeNumber(planRows[i]?.jan) ? (getSafeNumber(planRows[i]?.jan) | number:'1.2-2') : '-' }}</span><ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].jan" (ngModelChange)="calculateRowTotal(planRows[i])" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+              <td class="td-month"><span *ngIf="i !== 3">{{ getSafeNumber(planRows[i]?.feb) ? (getSafeNumber(planRows[i]?.feb) | number:'1.2-2') : '-' }}</span><ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].feb" (ngModelChange)="calculateRowTotal(planRows[i])" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+              <td class="td-month"><span *ngIf="i !== 3">{{ getSafeNumber(planRows[i]?.mar) ? (getSafeNumber(planRows[i]?.mar) | number:'1.2-2') : '-' }}</span><ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].mar" (ngModelChange)="calculateRowTotal(planRows[i])" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+              <td class="td-month"><span *ngIf="i !== 3">{{ getSafeNumber(planRows[i]?.apr) ? (getSafeNumber(planRows[i]?.apr) | number:'1.2-2') : '-' }}</span><ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].apr" (ngModelChange)="calculateRowTotal(planRows[i])" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+              <td class="td-month"><span *ngIf="i !== 3">{{ getSafeNumber(planRows[i]?.may) ? (getSafeNumber(planRows[i]?.may) | number:'1.2-2') : '-' }}</span><ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].may" (ngModelChange)="calculateRowTotal(planRows[i])" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+              <td class="td-month"><span *ngIf="i !== 3">{{ getSafeNumber(planRows[i]?.jun) ? (getSafeNumber(planRows[i]?.jun) | number:'1.2-2') : '-' }}</span><ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].jun" (ngModelChange)="calculateRowTotal(planRows[i])" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+              <td class="td-month"><span *ngIf="i !== 3">{{ getSafeNumber(planRows[i]?.jul) ? (getSafeNumber(planRows[i]?.jul) | number:'1.2-2') : '-' }}</span><ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].jul" (ngModelChange)="calculateRowTotal(planRows[i])" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+              <td class="td-month"><span *ngIf="i !== 3">{{ getSafeNumber(planRows[i]?.aug) ? (getSafeNumber(planRows[i]?.aug) | number:'1.2-2') : '-' }}</span><ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].aug" (ngModelChange)="calculateRowTotal(planRows[i])" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+              <td class="td-month"><span *ngIf="i !== 3">{{ getSafeNumber(planRows[i]?.sep) ? (getSafeNumber(planRows[i]?.sep) | number:'1.2-2') : '-' }}</span><ion-input *ngIf="i === 3" type="number" [(ngModel)]="planRows[i].sep" (ngModelChange)="calculateRowTotal(planRows[i])" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+
+              <td class="td-total">{{ getSafeNumber(planRows[i]?.total) ? (getSafeNumber(planRows[i]?.total) | number:'1.2-2') : '-' }}</td>
+            </tr>
+
+            <!-- SUB ROWS -->
+            <ng-container *ngIf="planRows[i]?.subRows && !planRows[i].subRowsCollapsed">
+              <ng-container *ngFor="let sub of planRows[i]?.subRows; let si = index">
+                <tr *ngIf="!sub.hidden" class="ap-sub-row">
+                  <td class="td-num td-sub-num">{{ i + 1 }}.{{ si + 1 }}</td>
+                  <td class="td-item td-sub-item">{{ sub.name }}</td>
+                  <td class="td-budget-op"><ion-input type="number" [(ngModel)]="sub.budget_op" (ngModelChange)="calculateMainRowFromSubRows(i)" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+                  <td class="td-budget-fund"><ion-input type="number" [(ngModel)]="sub.budget_fund" (ngModelChange)="calculateMainRowFromSubRows(i)" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+                  <td class="td-month"><ion-input type="number" [(ngModel)]="sub.oct" (ngModelChange)="calculateSubRowTotal(sub, i)" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+                  <td class="td-month"><ion-input type="number" [(ngModel)]="sub.nov" (ngModelChange)="calculateSubRowTotal(sub, i)" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+                  <td class="td-month"><ion-input type="number" [(ngModel)]="sub.dec" (ngModelChange)="calculateSubRowTotal(sub, i)" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+                  <td class="td-month"><ion-input type="number" [(ngModel)]="sub.jan" (ngModelChange)="calculateSubRowTotal(sub, i)" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+                  <td class="td-month"><ion-input type="number" [(ngModel)]="sub.feb" (ngModelChange)="calculateSubRowTotal(sub, i)" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+                  <td class="td-month"><ion-input type="number" [(ngModel)]="sub.mar" (ngModelChange)="calculateSubRowTotal(sub, i)" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+                  <td class="td-month"><ion-input type="number" [(ngModel)]="sub.apr" (ngModelChange)="calculateSubRowTotal(sub, i)" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+                  <td class="td-month"><ion-input type="number" [(ngModel)]="sub.may" (ngModelChange)="calculateSubRowTotal(sub, i)" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+                  <td class="td-month"><ion-input type="number" [(ngModel)]="sub.jun" (ngModelChange)="calculateSubRowTotal(sub, i)" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+                  <td class="td-month"><ion-input type="number" [(ngModel)]="sub.jul" (ngModelChange)="calculateSubRowTotal(sub, i)" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+                  <td class="td-month"><ion-input type="number" [(ngModel)]="sub.aug" (ngModelChange)="calculateSubRowTotal(sub, i)" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+                  <td class="td-month"><ion-input type="number" [(ngModel)]="sub.sep" (ngModelChange)="calculateSubRowTotal(sub, i)" class="ap-cell-input" inputmode="decimal"></ion-input></td>
+                  <td class="td-total td-sub-total">{{ sub.total ? (sub.total | number:'1.2-2') : '-' }}</td>
+                </tr>
+              </ng-container>
             </ng-container>
+
           </ng-container>
-        </ng-container>
-        <!-- End main ng-container for main rows -->
-      </tbody>
-      <tfoot>
-        <tr style="
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          font-weight: 700;
-          border-top: 3px solid #553c9a;
-          position: sticky;
-          bottom: 0;
-        ">
-          <td style="
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            text-align: center; 
-            background: rgba(255, 255, 255, 0.1);
-            padding: 14px 10px;
-            border-radius: 6px;
-          "></td>
-          <td style="
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            text-align: left; 
-            background: rgba(255, 255, 255, 0.1);
-            padding: 14px 10px;
-            font-weight: 700;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-            border-radius: 6px;
-          ">รวม</td>
-          <td style="
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); 
-            border: 1px solid rgba(245, 158, 11, 0.3); 
-            text-align: right; 
-            color: #92400e; 
-            font-weight: 700;
-            padding: 14px 10px;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
-            border-radius: 6px;
-          ">
-            {{ getSafeNumber(summary.budget_op) ? (getSafeNumber(summary.budget_op) | number:'1.2-2') : '-' }}
-          </td>
-          <td style="
-            background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%); 
-            border: 1px solid rgba(102, 126, 234, 0.3); 
-            text-align: right; 
-            color: #553c9a; 
-            font-weight: 700;
-            padding: 14px 10px;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
-            border-radius: 6px;
-          ">
-            {{ getSafeNumber(summary.budget_fund) ? (getSafeNumber(summary.budget_fund) | number:'1.2-2') : '-' }}
-          </td>
-          <td style="border: 1px solid rgba(255, 255, 255, 0.2); text-align: right; padding: 12px 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-            {{ getSafeNumber(summary.oct) ? (getSafeNumber(summary.oct) | number:'1.2-2') : '-' }}
-          </td>
-          <td style="border: 1px solid rgba(255, 255, 255, 0.2); text-align: right; padding: 12px 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-            {{ getSafeNumber(summary.nov) ? (getSafeNumber(summary.nov) | number:'1.2-2') : '-' }}
-          </td>
-          <td style="border: 1px solid rgba(255, 255, 255, 0.2); text-align: right; padding: 12px 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-            {{ getSafeNumber(summary.dec) ? (getSafeNumber(summary.dec) | number:'1.2-2') : '-' }}
-          </td>
-          <td style="border: 1px solid rgba(255, 255, 255, 0.2); text-align: right; padding: 12px 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-            {{ getSafeNumber(summary.jan) ? (getSafeNumber(summary.jan) | number:'1.2-2') : '-' }}
-          </td>
-          <td style="border: 1px solid rgba(255, 255, 255, 0.2); text-align: right; padding: 12px 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-            {{ getSafeNumber(summary.feb) ? (getSafeNumber(summary.feb) | number:'1.2-2') : '-' }}
-          </td>
-          <td style="border: 1px solid rgba(255, 255, 255, 0.2); text-align: right; padding: 12px 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-            {{ getSafeNumber(summary.mar) ? (getSafeNumber(summary.mar) | number:'1.2-2') : '-' }}
-          </td>
-          <td style="border: 1px solid rgba(255, 255, 255, 0.2); text-align: right; padding: 12px 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-            {{ getSafeNumber(summary.apr) ? (getSafeNumber(summary.apr) | number:'1.2-2') : '-' }}
-          </td>
-          <td style="border: 1px solid rgba(255, 255, 255, 0.2); text-align: right; padding: 12px 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-            {{ getSafeNumber(summary.may) ? (getSafeNumber(summary.may) | number:'1.2-2') : '-' }}
-          </td>
-          <td style="border: 1px solid rgba(255, 255, 255, 0.2); text-align: right; padding: 12px 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-            {{ getSafeNumber(summary.jun) ? (getSafeNumber(summary.jun) | number:'1.2-2') : '-' }}
-          </td>
-          <td style="border: 1px solid rgba(255, 255, 255, 0.2); text-align: right; padding: 12px 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-            {{ getSafeNumber(summary.jul) ? (getSafeNumber(summary.jul) | number:'1.2-2') : '-' }}
-          </td>
-          <td style="border: 1px solid rgba(255, 255, 255, 0.2); text-align: right; padding: 12px 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-            {{ getSafeNumber(summary.aug) ? (getSafeNumber(summary.aug) | number:'1.2-2') : '-' }}
-          </td>
-          <td style="border: 1px solid rgba(255, 255, 255, 0.2); text-align: right; padding: 12px 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-            {{ getSafeNumber(summary.sep) ? (getSafeNumber(summary.sep) | number:'1.2-2') : '-' }}
-          </td>
-          <td style="
-            border: 1px solid rgba(255, 255, 255, 0.3); 
-            text-align: right; 
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
-            font-weight: 800; 
-            min-width: 90px; 
-            max-width: 90px; 
-            width: 90px;
-            padding: 14px 10px;
-            border-radius: 8px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            font-size: 1.05em;
-          ">
-            <span style="display: inline-block; width: 100%; text-align: right;">
-              {{ getSafeNumber(summary.total) ? (getSafeNumber(summary.total) | number:'1.2-2') : '-' }}&nbsp;
-            </span>
-          </td>
-        </tr>
-      </tfoot>
-    </table>
-  
- 
- 
+        </tbody>
+        <tfoot>
+          <tr class="ap-tfoot-row">
+            <td class="tf-num"></td>
+            <td class="tf-label">รวมทั้งสิ้น</td>
+            <td class="tf-budget">{{ getSafeNumber(summary.budget_op) ? (getSafeNumber(summary.budget_op) | number:'1.2-2') : '0.00' }}</td>
+            <td class="tf-budget">{{ getSafeNumber(summary.budget_fund) ? (getSafeNumber(summary.budget_fund) | number:'1.2-2') : '0.00' }}</td>
+            <td class="tf-month">{{ getSafeNumber(summary.oct) ? (getSafeNumber(summary.oct) | number:'1.2-2') : '0.00' }}</td>
+            <td class="tf-month">{{ getSafeNumber(summary.nov) ? (getSafeNumber(summary.nov) | number:'1.2-2') : '0.00' }}</td>
+            <td class="tf-month">{{ getSafeNumber(summary.dec) ? (getSafeNumber(summary.dec) | number:'1.2-2') : '0.00' }}</td>
+            <td class="tf-month">{{ getSafeNumber(summary.jan) ? (getSafeNumber(summary.jan) | number:'1.2-2') : '0.00' }}</td>
+            <td class="tf-month">{{ getSafeNumber(summary.feb) ? (getSafeNumber(summary.feb) | number:'1.2-2') : '0.00' }}</td>
+            <td class="tf-month">{{ getSafeNumber(summary.mar) ? (getSafeNumber(summary.mar) | number:'1.2-2') : '0.00' }}</td>
+            <td class="tf-month">{{ getSafeNumber(summary.apr) ? (getSafeNumber(summary.apr) | number:'1.2-2') : '0.00' }}</td>
+            <td class="tf-month">{{ getSafeNumber(summary.may) ? (getSafeNumber(summary.may) | number:'1.2-2') : '0.00' }}</td>
+            <td class="tf-month">{{ getSafeNumber(summary.jun) ? (getSafeNumber(summary.jun) | number:'1.2-2') : '0.00' }}</td>
+            <td class="tf-month">{{ getSafeNumber(summary.jul) ? (getSafeNumber(summary.jul) | number:'1.2-2') : '0.00' }}</td>
+            <td class="tf-month">{{ getSafeNumber(summary.aug) ? (getSafeNumber(summary.aug) | number:'1.2-2') : '0.00' }}</td>
+            <td class="tf-month">{{ getSafeNumber(summary.sep) ? (getSafeNumber(summary.sep) | number:'1.2-2') : '0.00' }}</td>
+            <td class="tf-total">{{ getSafeNumber(summary.total) ? (getSafeNumber(summary.total) | number:'1.2-2') : '0.00' }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
   </div>
-  </div>
-  </div>
-  <!-- End main content container -->
+
+  <!-- Floating Save Button -->
+  <button class="ap-float-save" (click)="saveData()" title="บันทึกข้อมูล (Ctrl+S)">
+    <ion-icon name="save-outline"></ion-icon>
+    <span>บันทึก</span>
+  </button>
+
 </ion-content>
-
-<!-- Enhanced CSS with animations and improved styling -->
-<style>
-  /* Hide number input arrows in all browsers for ion-input */
-  ion-input input[type=number]::-webkit-inner-spin-button,
-  ion-input input[type=number]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  ion-input input[type=number] {
-    -moz-appearance: textfield; /* Firefox */
-    appearance: textfield; /* Standard property for compatibility */
-  }
-
-  /* Enhanced button hover effects */
-  ion-button {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  ion-button:hover {
-    transform: translateY(-2px) scale(1.02);
-    filter: brightness(1.1);
-  }
-
-  ion-button:active {
-    transform: translateY(0) scale(0.98);
-  }
-
-  /* Enhanced table animations */
-  table {
-    animation: fadeInUp 0.6s ease-out;
-  }
-
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* Smooth row transitions */
-  tbody tr {
-    transition: all 0.3s ease;
-  }
-
-  tbody tr:hover {
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
-    z-index: 5;
-    position: relative;
-  }
-
-  /* Enhanced scrollbar styling */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: rgba(102, 126, 234, 0.1);
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #553c9a 0%, #667eea 100%);
-  }
-
-  /* Enhanced input styling */
-  ion-input {
-    transition: all 0.3s ease;
-  }
-
-  ion-input:focus-within {
-    transform: scale(1.02);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
-  }
-
-  /* Glassmorphism effect enhancement */
-  .ion-padding {
-    position: relative;
-    overflow: hidden;
-  }
-
-  /* Floating animation for background elements */
-  @keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    33% { transform: translateY(-10px) rotate(1deg); }
-    66% { transform: translateY(5px) rotate(-1deg); }
-  }
-
-  /* Loading animation for table */
-  table tbody {
-    animation: slideIn 0.8s ease-out 0.2s both;
-  }
-
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateX(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
-  /* Enhanced focus states */
-  ion-input:focus-within,
-  ion-button:focus {
-    outline: 2px solid rgba(102, 126, 234, 0.5);
-    outline-offset: 2px;
-  }
-
-  /* Improved text rendering */
-  * {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-      }
-
-      /* Enhanced table styling classes */
-      .main-row {
-        transition: all 0.3s ease;
-        border-radius: 8px;
-      }
-
-      .main-row.even-row {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(255, 255, 255, 0.8) 100%);
-      }
-
-      .main-row.odd-row {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0%, rgba(248, 250, 252, 0.85) 100%);
-      }
-
-      .main-row:hover {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(255, 255, 255, 0.9) 100%) !important;
-        transform: scale(1.002);
-      }
-
-      .row-number-cell {
-        border: 1px solid rgba(102, 126, 234, 0.1); 
-        padding: 12px 10px; 
-        text-align: center; 
-        color: #667eea; 
-        font-weight: 700; 
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(255, 255, 255, 0.6) 100%);
-        position: relative;
-        border-radius: 8px;
-      }
-
-      .expand-button {
-        margin: 0; 
-        padding: 0; 
-        min-width: 32px; 
-        height: 32px; 
-        display: inline-flex; 
-        align-items: center; 
-        justify-content: center;
-        --border-radius: 50%;
-        --background: rgba(102, 126, 234, 0.1);
-        --color: #667eea;
-        transition: all 0.3s ease;
-      }
-
-      .category-cell {
-        border: 1px solid rgba(102, 126, 234, 0.1); 
-        padding: 12px 20px; 
-        color: #2d3748; 
-        font-weight: 600; 
-        text-align: left; 
-        background: rgba(255, 255, 255, 0.4);
-      }
-
-      .category-text {
-        font-size: 1.05em; 
-        text-shadow: 0 1px 2px rgba(0,0,0,0.05);
-      }
-
-      .budget-cell {
-        border: 1px solid rgba(102, 126, 234, 0.1); 
-        padding: 12px 15px; 
-        color: #667eea; 
-        font-weight: 600; 
-        text-align: right; 
-        background: rgba(255, 255, 255, 0.3);
-      }
-
-      .budget-amount {
-        font-size: 1.1em; 
-        font-weight: 700; 
-        text-shadow: 0 1px 2px rgba(102, 126, 234, 0.2);
-      }
-
-      .actual-cell {
-        border: 1px solid rgba(102, 126, 234, 0.1); 
-        padding: 12px 15px; 
-        color: #38a169; 
-        font-weight: 600; 
-        text-align: right; 
-        background: rgba(255, 255, 255, 0.3);
-      }
-
-      .actual-amount {
-        font-size: 1.1em; 
-        font-weight: 700; 
-        text-shadow: 0 1px 2px rgba(56, 161, 105, 0.2);
-      }
-
-      .variance-cell {
-        border: 1px solid rgba(102, 126, 234, 0.1); 
-        padding: 12px 15px; 
-        font-weight: 600; 
-        text-align: right; 
-        background: rgba(255, 255, 255, 0.3);
-      }
-
-      .variance-amount {
-        font-weight: 700; 
-        font-size: 1.1em;
-      }
-
-      .positive-variance {
-        color: #38a169; 
-        text-shadow: 0 1px 2px rgba(56, 161, 105, 0.2);
-      }
-
-      .negative-variance {
-        color: #e53e3e; 
-        text-shadow: 0 1px 2px rgba(229, 62, 62, 0.2);
-      }
-    </style>

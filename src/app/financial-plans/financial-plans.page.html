@@ -1,86 +1,115 @@
-<ion-menu side="start" menuId="main-menu" contentId="main-content">
-  <ion-header>
-    <ion-toolbar color="primary">
-      <ion-title>เมนู</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <ion-content>
-    <ion-list>
-      <ion-item routerLink="/financial-plans">
-        <ion-icon name="cash-outline" slot="start" color="success"></ion-icon>
-        เพิ่มข้อมูลงบจัดสรร
-      </ion-item>
-      <ion-item routerLink="/menu-6">
-        <ion-icon name="add-circle-outline" slot="start" color="primary"></ion-icon>
-        เพิ่มข้อมูลแผนการเงิน
-      </ion-item>
-      <ion-item routerLink="/records">
-        <ion-icon name="list-outline" slot="start" color="tertiary"></ion-icon>
-        เรียกดูข้อมูล
-      </ion-item>
-    </ion-list>
-  </ion-content>
-</ion-menu>
+<!-- Financial Plans Page — เพิ่มงบจัดสรร -->
 
 <ion-header [translucent]="true">
-  <ion-toolbar color="light">
+  <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-menu-button menu="main-menu"></ion-menu-button>
-      <ion-back-button defaultHref="/home"></ion-back-button>
+      <ion-back-button defaultHref="/navigator" text="กลับ"></ion-back-button>
     </ion-buttons>
     <ion-title>
-      <ion-icon name="cash-outline" style="vertical-align: middle; margin-right: 8px;" color="success"></ion-icon>
-      Financial Plans
+      <ion-icon name="cash-outline" class="toolbar-icon" style="color: #ffd60a;"></ion-icon>
+      จัดการงบจัดสรร
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content id="main-content" [fullscreen]="true" class="ion-padding">
-  <!-- Removed the year filter section here -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="cash-outline" color="success"></ion-icon>
-        เพิ่มแผนการเงินใหม่
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-item>
-        <ion-label position="floating">แผนการเงิน</ion-label>
-        <ion-input 
-          type="text" 
-          [(ngModel)]="planName"
-          placeholder="กรอกงบแผนการเงิน">
-        </ion-input>
-      </ion-item>
-      
-      <div style="display: flex; flex-direction: column; align-items: center; margin: 24px 0 8px 0;">
-        <ion-label style="margin-bottom: 8px; font-weight: bold; text-align: center; width: 100%;">ปีงบประมาณ</ion-label>
-        <ion-datetime
-          presentation="year"
-          [(ngModel)]="planDate"
-          placeholder="เลือกปี"
-          style="width: 180px; margin: 0 auto;"
-        ></ion-datetime>
-        <ion-text color="medium" *ngIf="planDate">
-          <small>ปี พ.ศ. {{ getBuddhistYear(planDate) }}</small>
-        </ion-text>
-      </div>
+<ion-content [fullscreen]="true" class="fp-content">
+  <div class="fp-container">
 
-      <ion-button expand="block" color="primary" (click)="savePlan()" style="margin-top: 16px;">
-        <ion-icon name="save-outline" slot="start"></ion-icon>
-        บันทึก
-      </ion-button>
-      <ion-button expand="block" color="tertiary" [routerLink]="['/records']">
-        <ion-icon name="list-outline" slot="start"></ion-icon>
-        Go to Records
-      </ion-button>
-      <ion-text color="success" *ngIf="planSaved">
-        <p>บันทึกแผนการเงินเรียบร้อยแล้ว!</p>
-      </ion-text>
-    </ion-card-content>
-  </ion-card>
+    <!-- Form Card -->
+    <ion-card class="fp-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="add-circle-outline" style="color: #06d6a0;"></ion-icon>
+          {{ editIndex !== null ? 'แก้ไขงบจัดสรร' : 'เพิ่มงบจัดสรรใหม่' }}
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
 
-  <!-- Add this section for displaying saved entries -->
-  
+        <!-- Budget Amount -->
+        <div class="form-field">
+          <label class="form-label">
+            <ion-icon name="wallet-outline"></ion-icon>
+            งบประมาณตั้งต้น (บาท)
+          </label>
+          <div class="input-box">
+            <ion-input
+              type="number"
+              [(ngModel)]="planName"
+              placeholder="เช่น 500000"
+              inputmode="decimal"
+              class="fp-input"
+            ></ion-input>
+            <span class="input-unit">บาท</span>
+          </div>
+        </div>
+
+        <!-- Budget Year -->
+        <div class="form-field">
+          <label class="form-label">
+            <ion-icon name="calendar-outline"></ion-icon>
+            ปีงบประมาณ (พ.ศ.)
+          </label>
+          <div class="input-box">
+            <ion-input
+              type="number"
+              [(ngModel)]="planDateYear"
+              placeholder="เช่น 2568"
+              inputmode="numeric"
+              maxlength="4"
+              class="fp-input"
+              (ionInput)="onYearInput($event)"
+            ></ion-input>
+            <span class="input-unit" *ngIf="planDateYear">
+              ค.ศ. {{ +planDateYear - 543 }}
+            </span>
+          </div>
+          <div class="field-hint" *ngIf="planDateYear">
+            ปีงบประมาณ พ.ศ. {{ planDateYear }}
+          </div>
+        </div>
+
+        <!-- Save Button -->
+        <button class="fp-save-btn" (click)="savePlan()" [disabled]="!planName || !planDateYear">
+          <ion-icon name="save-outline"></ion-icon>
+          {{ editIndex !== null ? 'บันทึกการแก้ไข' : 'บันทึกงบจัดสรร' }}
+        </button>
+
+        <!-- Go to Records Button -->
+        <button class="fp-secondary-btn" [routerLink]="['/records']">
+          <ion-icon name="list-outline"></ion-icon>
+          ดูข้อมูลทั้งหมด
+        </button>
+
+        <!-- Success message -->
+        <div class="success-banner" *ngIf="planSaved">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>บันทึกข้อมูลสำเร็จ!</span>
+        </div>
+
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Saved Plans List -->
+    <ion-card class="fp-card" *ngIf="savedEntries.length > 0">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="albums-outline" style="color: #0077b6;"></ion-icon>
+          งบจัดสรรที่บันทึกไว้ ({{ savedEntries.length }} รายการ)
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="plan-list">
+          <div class="plan-item" *ngFor="let plan of savedEntries; let i = index">
+            <div class="plan-year-badge">
+              พ.ศ. {{ getBuddhistYear(plan.date) }}
+            </div>
+            <div class="plan-info">
+              <div class="plan-amount">{{ plan.name | number:'1.2-2' }} บาท</div>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+  </div>
 </ion-content>
