@@ -219,3 +219,22 @@
     color: #0f4c81;
   }
 }
+
+.plan-delete-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  color: #94a3b8;
+  font-size: 1.1em;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+
+  &:hover {
+    background: #fee2e2;
+    color: #ef476f;
+  }
+}

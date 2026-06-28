@@ -7,10 +7,24 @@ export class AdminGuard implements CanActivate {
 
   canActivate(): boolean {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (user && user.isAdmin) {
+    if (user && (user.isAdmin || user.username === 'admin')) {
       return true;
     }
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home']);
+    return false;
+  }
+}
+
+@Injectable({ providedIn: 'root' })
+export class AuthGuard implements CanActivate {
+  constructor(private router: Router) {}
+
+  canActivate(): boolean {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user && user.username) {
+      return true;
+    }
+    this.router.navigate(['/home']);
     return false;
   }
 }

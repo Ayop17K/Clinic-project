@@ -38,7 +38,7 @@
     <div class="menu-grid">
 
       <!-- Card 1: เพิ่มข้อมูลแผนการใช้จ่าย -->
-      <div class="menu-card" [routerLink]="['/all-plan']">
+      <div class="menu-card" [routerLink]="['/all-plan']" *ngIf="isAdmin">
         <div class="card-icon-wrap" style="background: linear-gradient(135deg, #0f4c81, #0077b6);">
           <ion-icon name="create-outline"></ion-icon>
         </div>
@@ -52,15 +52,15 @@
         </div>
       </div>
 
-      <!-- Card 2: เรียกดูข้อมูลแผนการใช้จ่าย -->
-      <div class="menu-card" [routerLink]="['/plan-record']">
+      <!-- Card 2: เรียกดูข้อมูลแผนการใช้จ่าย (กราฟและวิเคราะห์) -->
+      <div class="menu-card" [routerLink]="['/records']">
         <div class="card-icon-wrap" style="background: linear-gradient(135deg, #0077b6, #00b4d8);">
-          <ion-icon name="document-text-outline"></ion-icon>
+          <ion-icon name="pie-chart-outline"></ion-icon>
         </div>
         <div class="card-body">
           <div class="card-title">เรียกดูข้อมูล</div>
-          <div class="card-title-th">แผนการใช้จ่าย</div>
-          <div class="card-desc">ดูสรุปตารางแผนงบประมาณทั้งหมด</div>
+          <div class="card-title-th">กราฟและวิเคราะห์</div>
+          <div class="card-desc">ดูสรุปรายงานในรูปแบบกราฟและแนวโน้มสะสม</div>
         </div>
         <div class="card-arrow">
           <ion-icon name="chevron-forward-outline"></ion-icon>
@@ -68,7 +68,7 @@
       </div>
 
       <!-- Card 3: งบจัดสรร -->
-      <div class="menu-card" [routerLink]="['/financial-plans']">
+      <div class="menu-card" [routerLink]="['/financial-plans']" *ngIf="isAdmin">
         <div class="card-icon-wrap" style="background: linear-gradient(135deg, #06d6a0, #0077b6);">
           <ion-icon name="cash-outline"></ion-icon>
         </div>
@@ -82,15 +82,15 @@
         </div>
       </div>
 
-      <!-- Card 4: Records -->
-      <div class="menu-card" [routerLink]="['/records']">
+      <!-- Card 4: ตารางสรุปแผนงบประมาณ -->
+      <div class="menu-card" [routerLink]="['/plan-record']">
         <div class="card-icon-wrap" style="background: linear-gradient(135deg, #ffd60a, #f59e0b);">
-          <ion-icon name="list-circle-outline" style="color: #92400e;"></ion-icon>
+          <ion-icon name="document-text-outline" style="color: #92400e;"></ion-icon>
         </div>
         <div class="card-body">
-          <div class="card-title" style="color: #92400e;">สรุปข้อมูล</div>
-          <div class="card-title-th" style="color: #78350f;">ทั้งหมด</div>
-          <div class="card-desc">ดูและ export ข้อมูลแผนและงบจัดสรร</div>
+          <div class="card-title" style="color: #92400e;">ตารางงบประมาณ</div>
+          <div class="card-title-th" style="color: #78350f;">Plan Record</div>
+          <div class="card-desc">ดูตารางสรุปแผนงบประมาณรายเดือนทั้งหมด</div>
         </div>
         <div class="card-arrow">
           <ion-icon name="chevron-forward-outline"></ion-icon>
@@ -98,7 +98,7 @@
       </div>
 
       <!-- Card 5: Simulate Data -->
-      <div class="menu-card" (click)="simulate5YearsData()" style="grid-column: span 2; border: 1.5px dashed #00b4d8; background: #f0f9ff;">
+      <div class="menu-card" (click)="simulate5YearsData()" style="grid-column: span 2; border: 1.5px dashed #00b4d8; background: #f0f9ff;" *ngIf="isAdmin">
         <div class="card-icon-wrap" style="background: linear-gradient(135deg, #00b4d8, #0f4c81);">
           <ion-icon name="server-outline"></ion-icon>
         </div>

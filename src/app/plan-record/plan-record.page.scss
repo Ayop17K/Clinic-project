@@ -162,7 +162,8 @@
 
 // ---- Table ----
 .pr-table-wrap {
-  overflow-x: auto;
+  max-height: 65vh; /* Contain table scroll vertically so headers freeze at the top of the container */
+  overflow: auto; /* Enable both horizontal and vertical scrolling inside the container */
   border-radius: 16px;
   background: #ffffff;
   box-shadow: 0 4px 24px rgba(15, 76, 129, 0.1);

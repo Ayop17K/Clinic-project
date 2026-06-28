@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-financial-plans',
@@ -16,8 +17,9 @@ export class FinancialPlansPage implements OnInit {
   editIndex: number | null = null;
   today = new Date();
   selectedYear: string = '';
+  savedEntries: { name: string, date: string }[] = [];
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(private route: ActivatedRoute, private router: Router, private http: HttpClient) {}
 
   ngOnInit() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -26,12 +28,13 @@ export class FinancialPlansPage implements OnInit {
       return;
     }
 
+    this.loadPlans();
+
     this.route.queryParams.subscribe(params => {
       if (params['edit'] !== undefined) {
         const index = +params['edit'];
-        const existing = localStorage.getItem('financial_plans');
-        const plans = existing ? JSON.parse(existing) : [];
-        const plan = plans[index];
+        this.loadPlans();
+        const plan = this.savedEntries[index];
         if (plan) {
           this.editIndex = index;
           this.planName = plan.name;
@@ -43,6 +46,43 @@ export class FinancialPlansPage implements OnInit {
     });
   }
 
+  loadPlans() {
+    this.http.get<any[]>('http://localhost:3000/api/financial-plans').subscribe({
+      next: (plans) => {
+        this.savedEntries = plans || [];
+      },
+      error: (err) => {
+        console.error('Error fetching plans in financial-plans page, using local fallback:', err);
+        const existing = localStorage.getItem('financial_plans');
+        this.savedEntries = existing ? JSON.parse(existing) : [];
+      }
+    });
+  }
+
+  deletePlan(index: number) {
+    this.savedEntries.splice(index, 1);
+    this.http.post('http://localhost:3000/api/financial-plans', { plans: this.savedEntries }).subscribe({
+      next: () => {
+        localStorage.setItem('financial_plans', JSON.stringify(this.savedEntries));
+        this.loadPlans();
+      },
+      error: (err) => {
+        console.error('Error deleting plan on backend:', err);
+        localStorage.setItem('financial_plans', JSON.stringify(this.savedEntries));
+        this.loadPlans();
+      }
+    });
+  }
+
+  editPlan(index: number) {
+    const plan = this.savedEntries[index];
+    if (plan) {
+      this.editIndex = index;
+      this.planName = plan.name;
+      this.planDateYear = this.getBuddhistYear(plan.date);
+    }
+  }
+
   /** Handle year input — convert พ.ศ. to stored ค.ศ. ISO string */
   onYearInput(event: any) {
     const val = event?.detail?.value || this.planDateYear;
@@ -50,9 +90,6 @@ export class FinancialPlansPage implements OnInit {
   }
 
   savePlan() {
-    const existing = localStorage.getItem('financial_plans');
-    let plans: { name: string, date: string }[] = existing ? JSON.parse(existing) : [];
-
     if (!this.planName || this.planName.toString().trim() === '') return;
     if (!this.planDateYear || this.planDateYear.toString().trim() === '') return;
 
@@ -60,28 +97,45 @@ export class FinancialPlansPage implements OnInit {
     const dateToSave = this.planDateYear.toString().trim();
 
     if (this.editIndex !== null) {
-      plans[this.editIndex] = {
+      this.savedEntries[this.editIndex] = {
         name: this.planName.toString().trim(),
         date: dateToSave
       };
       this.editIndex = null;
     } else {
-      plans.push({
+      this.savedEntries.push({
         name: this.planName.toString().trim(),
         date: dateToSave
       });
     }
 
-    localStorage.setItem('financial_plans', JSON.stringify(plans));
-    this.planSaved = true;
-    setTimeout(() => {
-      this.planSaved = false;
-      this.router.navigate(['/records']);
-    }, 1500);
+    this.http.post('http://localhost:3000/api/financial-plans', { plans: this.savedEntries }).subscribe({
+      next: () => {
+        localStorage.setItem('financial_plans', JSON.stringify(this.savedEntries));
+        this.planSaved = true;
+        setTimeout(() => {
+          this.planSaved = false;
+          this.router.navigate(['/records']);
+        }, 1500);
 
-    this.planName = '';
-    this.planDate = '';
-    this.planDateYear = '';
+        this.planName = '';
+        this.planDate = '';
+        this.planDateYear = '';
+      },
+      error: (err) => {
+        console.error('Error saving plan to backend:', err);
+        localStorage.setItem('financial_plans', JSON.stringify(this.savedEntries));
+        this.planSaved = true;
+        setTimeout(() => {
+          this.planSaved = false;
+          this.router.navigate(['/records']);
+        }, 1500);
+
+        this.planName = '';
+        this.planDate = '';
+        this.planDateYear = '';
+      }
+    });
   }
 
   resetDateToNow() {
@@ -90,10 +144,7 @@ export class FinancialPlansPage implements OnInit {
     this.planDate = new Date().toISOString().slice(0, 10);
   }
 
-  get savedEntries(): { name: string, date: string }[] {
-    const existing = localStorage.getItem('financial_plans');
-    return existing ? JSON.parse(existing) : [];
-  }
+
 
   get filteredEntries() {
     if (!this.selectedYear) return this.savedEntries;

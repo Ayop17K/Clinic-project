@@ -74,11 +74,11 @@
           {{ editIndex !== null ? 'บันทึกการแก้ไข' : 'บันทึกงบจัดสรร' }}
         </button>
 
-        <!-- Go to Records Button -->
+        <!-- Go to Records Button
         <button class="fp-secondary-btn" [routerLink]="['/records']">
           <ion-icon name="list-outline"></ion-icon>
           ดูข้อมูลทั้งหมด
-        </button>
+        </button> -->
 
         <!-- Success message -->
         <div class="success-banner" *ngIf="planSaved">
@@ -105,6 +105,14 @@
             </div>
             <div class="plan-info">
               <div class="plan-amount">{{ plan.name | number:'1.2-2' }} บาท</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="plan-edit-btn" (click)="editPlan(i)" title="แก้ไขงบจัดสรร" style="background: rgba(14, 165, 233, 0.1); color: #0ea5e9; border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;">
+                <ion-icon name="create-outline"></ion-icon>
+              </button>
+              <button class="plan-delete-btn" (click)="deletePlan(i)" title="ลบงบจัดสรร">
+                <ion-icon name="trash-outline"></ion-icon>
+              </button>
             </div>
           </div>
         </div>

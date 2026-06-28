@@ -611,10 +611,10 @@ export class AllPlanPage implements OnInit {
   }
 
   addSubItem(row: any): void {
-    if (!row.subItems) {
-      row.subItems = [];
+    if (!row.subRows) {
+      row.subRows = [];
     }
-    row.subItems.push({
+    row.subRows.push({
       name: '',
       budget_op: '',
       budget_fund: '',
@@ -635,10 +635,10 @@ export class AllPlanPage implements OnInit {
   }
 
   removeSubItem(sub: any, row: any): void {
-    if (!row.subItems) return;
-    const idx = row.subItems.indexOf(sub);
+    if (!row.subRows) return;
+    const idx = row.subRows.indexOf(sub);
     if (idx > -1) {
-      row.subItems.splice(idx, 1);
+      row.subRows.splice(idx, 1);
       this.calculateSummary();
     }
   }
@@ -730,7 +730,7 @@ export class AllPlanPage implements OnInit {
   ngOnInit() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (!user || !user.isAdmin) {
-      this.router.navigate(['/login']); // or show an error
+      this.router.navigate(['/home']); // redirect to home
       return;
     }
     

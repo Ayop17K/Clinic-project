@@ -48,11 +48,11 @@
         Export CSV
       </button>
       <button class="pr-btn pr-btn-danger" (click)="confirmDeleteRow()"
-        [disabled]="!planYear || planRows.length === 0">
+        [disabled]="!planYear || planRows.length === 0" *ngIf="isAdmin">
         <ion-icon name="trash-outline"></ion-icon>
         ลบทั้งปีนี้
       </button>
-      <button class="pr-btn pr-btn-primary" (click)="goToAllPlan()">
+      <button class="pr-btn pr-btn-primary" (click)="goToAllPlan()" *ngIf="isAdmin">
         <ion-icon name="create-outline"></ion-icon>
         แก้ไขแผน
       </button>

@@ -183,8 +183,17 @@
             <ng-container *ngIf="planRows[i]?.subRows && !planRows[i].subRowsCollapsed">
               <ng-container *ngFor="let sub of planRows[i]?.subRows; let si = index">
                 <tr *ngIf="!sub.hidden" class="ap-sub-row">
-                  <td class="td-num td-sub-num">{{ i + 1 }}.{{ si + 1 }}</td>
-                  <td class="td-item td-sub-item">{{ sub.name }}</td>
+                  <td class="td-num td-sub-num">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                      <span>{{ i + 1 }}.{{ si + 1 }}</span>
+                      <button type="button" (click)="removeSubItem(sub, planRows[i])" title="ลบรายการย่อยนี้" style="background: transparent; color: #ef4444; border: none; font-size: 1.1em; padding: 0; cursor: pointer; display: flex; align-items: center;">
+                        <ion-icon name="close-circle-outline"></ion-icon>
+                      </button>
+                    </div>
+                  </td>
+                  <td class="td-item td-sub-item">
+                    <ion-input type="text" [(ngModel)]="sub.name" placeholder="ชื่อรายการย่อย" class="ap-cell-input" style="font-weight: 500;"></ion-input>
+                  </td>
                   <td class="td-budget-op"><ion-input type="number" [(ngModel)]="sub.budget_op" (ngModelChange)="calculateMainRowFromSubRows(i)" class="ap-cell-input" inputmode="decimal"></ion-input></td>
                   <td class="td-budget-fund"><ion-input type="number" [(ngModel)]="sub.budget_fund" (ngModelChange)="calculateMainRowFromSubRows(i)" class="ap-cell-input" inputmode="decimal"></ion-input></td>
                   <td class="td-month"><ion-input type="number" [(ngModel)]="sub.oct" (ngModelChange)="calculateSubRowTotal(sub, i)" class="ap-cell-input" inputmode="decimal"></ion-input></td>
@@ -202,6 +211,16 @@
                   <td class="td-total td-sub-total">{{ sub.total ? (sub.total | number:'1.2-2') : '-' }}</td>
                 </tr>
               </ng-container>
+              <!-- Button row to add sub-row -->
+              <tr class="ap-sub-row ap-add-sub-row" style="background: rgba(14, 165, 233, 0.04);">
+                <td class="td-num td-sub-num"></td>
+                <td colspan="15" style="padding: 6px 12px; text-align: left;">
+                  <button type="button" (click)="addSubItem(planRows[i])" class="ap-btn-add-sub" style="background: #0ea5e9; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.82em; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s ease;">
+                    <ion-icon name="add-circle-outline"></ion-icon>
+                    เพิ่มรายการย่อยสำหรับหมวดนี้
+                  </button>
+                </td>
+              </tr>
             </ng-container>
 
           </ng-container>

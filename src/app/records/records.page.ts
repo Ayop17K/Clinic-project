@@ -1,5 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
+import { Chart, registerables } from 'chart.js';
+
+import { HttpClient } from '@angular/common/http';
+
+Chart.register(...registerables);
 
 interface Menu6Entry {
   number: number | null;
@@ -28,30 +33,153 @@ export class RecordsPage implements OnInit {
   showPlans: boolean = true;
   selectedYear: string = '';
 
-  // เพิ่มตัวแปรในคลาส
+  // เพิ่มตัวแปรสำหรับกราฟ
+  activeTab: string = 'charts';
+  donutChartInstance: any = null;
+  barChartInstance: any = null;
+  trendChartInstance: any = null;
+
+  recordYears: string[] = [];
+  filteredSavedEntries: any[] = [];
+  filteredFinancialPlans: any[] = [];
+  trendViewMode: string = 'monthly';
+  isAdmin: boolean = false;
+
   tableData: any[] = [];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (!user || !user.isAdmin) {
-      this.router.navigate(['/login']); // or show an error
+    if (!user || !user.username) {
+      this.router.navigate(['/home']);
       return;
+    }
+    const username = (user.username || '').toString().trim().toLowerCase();
+    this.isAdmin = !!user.isAdmin || username === 'admin';
+    this.cdr.detectChanges();
+
+    this.http.get<any[]>('http://localhost:3000/api/financial-plans').subscribe({
+      next: (plans) => {
+        if (!plans || plans.length === 0) {
+          // Only auto-simulate if user is admin
+          if (this.isAdmin) {
+            this.simulate5YearsData(true);
+          } else {
+            this.loadData();
+          }
+        } else {
+          this.loadData();
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching plans on init, falling back to local simulation check:', err);
+        const existingPlans = localStorage.getItem('financial_plans');
+        const parsedPlans = existingPlans ? JSON.parse(existingPlans) : [];
+        if (parsedPlans.length === 0) {
+          if (this.isAdmin) {
+            this.simulate5YearsData(true);
+          } else {
+            this.loadData();
+          }
+        } else {
+          this.loadData();
+        }
+      }
+    });
+  }
+
+  ionViewWillEnter() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user && user.username) {
+      const username = (user.username || '').toString().trim().toLowerCase();
+      this.isAdmin = !!user.isAdmin || username === 'admin';
+      this.cdr.detectChanges();
     }
     this.loadData();
   }
 
-  ionViewWillEnter() {
-    this.loadData();
+  ionViewDidEnter() {
+    this.updateCharts();
   }
 
   loadData() {
-    const entries = localStorage.getItem('menu6_entries');
-    this.savedEntries = entries ? JSON.parse(entries) : [];
+    this.http.get<any[]>('http://localhost:3000/api/menu6-entries').subscribe({
+      next: (entries) => {
+        this.savedEntries = entries || [];
+        this.http.get<any[]>('http://localhost:3000/api/financial-plans').subscribe({
+          next: (plans) => {
+            this.financialPlans = plans || [];
+            this.updateFiltersAndRender();
+          },
+          error: (err) => {
+            console.error('Error loading plans:', err);
+            const plans = localStorage.getItem('financial_plans');
+            this.financialPlans = plans ? JSON.parse(plans) : [];
+            this.updateFiltersAndRender();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error loading entries:', err);
+        const entries = localStorage.getItem('menu6_entries');
+        this.savedEntries = entries ? JSON.parse(entries) : [];
+        const plans = localStorage.getItem('financial_plans');
+        this.financialPlans = plans ? JSON.parse(plans) : [];
+        this.updateFiltersAndRender();
+      }
+    });
+  }
 
-    const plans = localStorage.getItem('financial_plans');
-    this.financialPlans = plans ? JSON.parse(plans) : [];
+  private updateFiltersAndRender() {
+    this.updateFilters();
+    if (!this.selectedYear && this.recordYears.length > 0) {
+      this.selectedYear = this.recordYears[this.recordYears.length - 1]; // default to latest year
+      this.updateFilters();
+    }
+    this.updateCharts();
+  }
+
+  updateFilters() {
+    // 1. Calculate recordYears
+    const years = Array.from(
+      new Set(
+        this.financialPlans
+          .map(plan => {
+            if (plan.date && plan.date.length >= 4) {
+              return plan.date.slice(0, 4);
+            }
+            return plan.date;
+          })
+          .filter(y => !!y)
+      )
+    );
+    this.recordYears = (years as string[]).sort();
+
+    // 2. Filter saved entries
+    if (!this.selectedYear) {
+      this.filteredSavedEntries = this.savedEntries;
+    } else {
+      this.filteredSavedEntries = this.savedEntries.filter(entry => {
+        if (!entry.date) return false;
+        const entryYear = entry.date.length >= 4 ? entry.date.slice(0, 4) : entry.date;
+        return entryYear === this.selectedYear;
+      });
+    }
+
+    // 3. Filter financial plans
+    let plans = this.financialPlans;
+    if (this.selectedYear) {
+      plans = plans.filter(plan => {
+        const planYear = plan.date && plan.date.length >= 4 ? plan.date.slice(0, 4) : plan.date;
+        return planYear === this.selectedYear;
+      });
+    }
+    this.filteredFinancialPlans = plans.slice().sort((a, b) => {
+      if (!a.date) return 1;
+      if (!b.date) return -1;
+      return a.date.localeCompare(b.date);
+    });
   }
 
   editEntry(index: number) {
@@ -176,14 +304,16 @@ deletePlan(index: number) {
 
   getBuddhistYear(dateStr: string): string {
     if (!dateStr) return '';
-    // If dateStr is just a year (e.g. "2024")
+    // If already a 4-digit year (could be พ.ศ. already stored)
     if (/^\d{4}$/.test(dateStr)) {
-      return (parseInt(dateStr, 10) + 543).toString();
+      const num = parseInt(dateStr, 10);
+      // If > 2100 it's already พ.ศ., if < 2100 it's ค.ศ. — convert
+      return num > 2100 ? num.toString() : (num + 543).toString();
     }
-    // If dateStr is a full date
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) return dateStr;
-    return (date.getFullYear() + 543).toString();
+    const year = date.getFullYear();
+    return year > 2100 ? year.toString() : (year + 543).toString();
   }
 
   getBuddhistDate(dateStr: string): string {
@@ -199,51 +329,10 @@ deletePlan(index: number) {
     return `${day} ${month} ${buddhistYear}, ${hour}:${min}`;
   }
 
-  get recordYears(): string[] {
-  // Collect unique years from financialPlans
-  const years = Array.from(
-    new Set(
-      this.financialPlans
-        .map(plan => {
-          // Extract year from plan.date (supports YYYY-MM-DD or YYYY)
-          if (plan.date && plan.date.length >= 4) {
-            return plan.date.slice(0, 4);
-          }
-          return plan.date;
-        })
-        .filter(y => !!y)
-    )
-  );
-  return years.sort();
-}
-
   clearYearFilter() {
     this.selectedYear = '';
+    this.updateFilters();
   }
-
-  get filteredSavedEntries() {
-  if (!this.selectedYear) return this.savedEntries;
-  return this.savedEntries.filter(entry => {
-    if (!entry.date) return false;
-    const entryYear = entry.date.length >= 4 ? entry.date.slice(0, 4) : entry.date;
-    return entryYear === this.selectedYear;
-  });
-}
-
-get filteredFinancialPlans() {
-  let plans = this.financialPlans;
-  if (this.selectedYear) {
-    plans = plans.filter(plan => {
-      const planYear = plan.date && plan.date.length >= 4 ? plan.date.slice(0, 4) : plan.date;
-      return planYear === this.selectedYear;
-    });
-  }
-  return plans.slice().sort((a, b) => {
-    if (!a.date) return 1;
-    if (!b.date) return -1;
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
-  });
-}
 
 // ...function removed as requested...
 
@@ -259,36 +348,81 @@ onFileSelected(event: any) {
   reader.readAsText(file, 'utf-8');
 }
 
-  simulate5YearsData() {
+  simulate5YearsData(auto: boolean = false) {
     try {
       const years = ['2564', '2565', '2566', '2567', '2568'];
       const months = ['oct', 'nov', 'dec', 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep'];
       
+      // Clear old simulation data to prevent caching/merging issues
+      localStorage.removeItem('financial_plans');
+      localStorage.removeItem('menu6_entries');
+      years.forEach(y => {
+        localStorage.removeItem(`allPlanRows-${y}`);
+      });
+
+      const budgetMap: { [key: string]: number } = {};
       const financialPlans = years.map((y, idx) => {
-        const baseBudget = 1500000 + (idx * 200000) + Math.floor(Math.random() * 100000);
+        // Budgets always under 2 Million (between 1.2M and 1.8M)
+        const baseBudget = 1200000 + (idx * 120000) + Math.floor(Math.random() * 50000);
+        budgetMap[y] = baseBudget;
         return { name: baseBudget.toString(), date: y };
       });
       localStorage.setItem('financial_plans', JSON.stringify(financialPlans));
 
       const mockEntries: any[] = [];
+      const spendCategories = [
+        { name: 'ซื้อเวชภัณฑ์ยา', type: 'เงินบำรุง' },
+        { name: 'ซื้อวัสดุวิทยาศาสตร์การแพทย์', type: 'เงินบำรุง' },
+        { name: 'จ่ายค่าจ้างลูกจ้างชั่วคราว', type: 'เงินบำรุง' },
+        { name: 'จ่ายค่าตอบแทน OT', type: 'เงินบำรุง' },
+        { name: 'จ่ายค่าสาธารณูปโภค', type: 'เงินบำรุง' },
+        { name: 'ค่าซ่อมแซมและบำรุงรักษาครุภัณฑ์', type: 'เงินบำรุง' }
+      ];
+
       years.forEach((year) => {
         const yearInt = parseInt(year);
-        const numRecords = 3 + Math.floor(Math.random() * 3);
-        const spendTypes = ['ค่ายา', 'ค่าวัสดุสำนักงาน', 'ค่าตอบแทน OT', 'ค่าซ่อมบำรุง', 'ค่าประปา-ไฟฟ้า'];
+        const calYear = yearInt - 543;
+        const baseBudget = budgetMap[year] || 1200000;
         
-        for (let i = 0; i < numRecords; i++) {
-          const withdrawAmount = 20000 + Math.floor(Math.random() * 30000);
+        // Target total spent is around 75% to 88% of baseBudget (never fully spent)
+        const targetSpent = baseBudget * (0.75 + Math.random() * 0.13);
+        
+        // For the latest year (2568), simulate that we are currently in June,
+        // so we only have spent entries up to May (8 months: Oct - May).
+        const maxMonths = year === '2568' ? 8 : 12;
+        
+        for (let mIdx = 0; mIdx < maxMonths; mIdx++) {
+          const withdrawAmount = Math.round((targetSpent / 12) * (0.85 + Math.random() * 0.3));
+          
+          let itemYear = calYear;
+          let itemMonth = 1;
+          if (mIdx < 3) {
+            itemYear = calYear - 1;
+            itemMonth = 10 + mIdx;
+          } else {
+            itemMonth = mIdx - 2;
+          }
+          
+          const monthStr = itemMonth.toString().padStart(2, '0');
+          const dayStr = (10 + Math.floor(Math.random() * 15)).toString().padStart(2, '0');
+          const dateStr = `${itemYear}-${monthStr}-${dayStr}`;
+          
+          const cat = spendCategories[mIdx % spendCategories.length];
           mockEntries.push({
-            itemName: spendTypes[Math.floor(Math.random() * spendTypes.length)] + ` (ครั้งที่ ${i + 1})`,
+            itemName: cat.name + ` (ประจำเดือน ${itemMonth}/${itemYear + 543})`,
             withdraw: withdrawAmount.toString(),
-            withdrawType: 'เงินบำรุง',
-            date: `${yearInt - 543}-05-${10 + i}`
+            withdrawType: cat.type,
+            date: dateStr
           });
         }
       });
       localStorage.setItem('menu6_entries', JSON.stringify(mockEntries));
 
+      const rowsMap: { [key: string]: any } = {};
+
       years.forEach(year => {
+        const baseBudget = budgetMap[year] || 1200000;
+        
         const rows = this.getDefaultPlanRowsTemplate().map((row, rIdx) => {
           if (row.subRows && row.subRows.length > 0) {
             row.subRows.forEach((sub: any) => {
@@ -328,17 +462,85 @@ onFileSelected(event: any) {
           return row;
         });
 
-        localStorage.setItem(`allPlanRows-${year}`, JSON.stringify({
+        // Scale plan rows so their grand total matches 96% of the allocated baseBudget
+        let grandTotal = 0;
+        rows.forEach(row => {
+          grandTotal += row.total || 0;
+        });
+
+        const scaleFactor = (baseBudget * 0.96) / grandTotal;
+
+        rows.forEach(row => {
+          row.budget_op = Math.round((row.budget_op || 0) * scaleFactor);
+          row.budget_fund = Math.round((row.budget_fund || 0) * scaleFactor);
+          row.total = Math.round((row.total || 0) * scaleFactor);
+          months.forEach(m => {
+            row[m] = Math.round((row[m] || 0) * scaleFactor);
+          });
+
+          if (row.subRows && row.subRows.length > 0) {
+            row.subRows.forEach((sub: any) => {
+              sub.budget_op = Math.round((sub.budget_op || 0) * scaleFactor);
+              sub.budget_fund = Math.round((sub.budget_fund || 0) * scaleFactor);
+              sub.total = Math.round((sub.total || 0) * scaleFactor);
+              months.forEach(m => {
+                sub[m] = Math.round((sub[m] || 0) * scaleFactor);
+              });
+            });
+          }
+        });
+
+        rowsMap[year] = {
           rows: rows,
           savedAt: new Date().toISOString()
-        }));
+        };
+        localStorage.setItem(`allPlanRows-${year}`, JSON.stringify(rowsMap[year]));
       });
 
-      alert('จำลองข้อมูล 5 ปีงบประมาณสำเร็จแล้ว (พ.ศ. 2564 - 2568)!');
-      window.location.reload();
+      // Post all items to backend API
+      this.http.post('http://localhost:3000/api/reset-db', {}).subscribe({
+        next: () => {
+          this.http.post('http://localhost:3000/api/financial-plans', { plans: financialPlans }).subscribe({
+            next: () => {
+              this.http.post('http://localhost:3000/api/menu6-entries', { entries: mockEntries }).subscribe({
+                next: () => {
+                  let savedCount = 0;
+                  years.forEach(year => {
+                    this.http.post(`http://localhost:3000/api/plan-rows/${year}`, rowsMap[year]).subscribe({
+                      next: () => {
+                        savedCount++;
+                        if (savedCount === years.length) {
+                          if (!auto) {
+                            alert('จำลองข้อมูล 5 ปีงบประมาณลงฐานข้อมูลสำเร็จแล้ว (พ.ศ. 2564 - 2568)!');
+                            window.location.reload();
+                          } else {
+                            this.loadData();
+                          }
+                        }
+                      },
+                      error: (err) => {
+                        console.error(`Error saving plan rows for ${year}:`, err);
+                      }
+                    });
+                  });
+                }
+              });
+            }
+          });
+        },
+        error: (err) => {
+          console.error('Error resetting backend DB, using local only:', err);
+          if (!auto) {
+            alert('จำลองข้อมูลสำเร็จ (บันทึกเฉพาะในเบราว์เซอร์)!');
+            window.location.reload();
+          } else {
+            this.loadData();
+          }
+        }
+      });
     } catch (err) {
       console.error(err);
-      alert('เกิดข้อผิดพลาดในการจำลองข้อมูล');
+      if (!auto) alert('เกิดข้อผิดพลาดในการจำลองข้อมูล');
     }
   }
 
@@ -466,5 +668,389 @@ onFileSelected(event: any) {
         ]
       }
     ];
+  }
+
+  selectTab(tab: string) {
+    this.activeTab = tab;
+    this.updateCharts();
+  }
+
+  setTrendViewMode(mode: string) {
+    this.trendViewMode = mode;
+    if (this.trendChartInstance) {
+      this.trendChartInstance.destroy();
+      this.trendChartInstance = null;
+    }
+    setTimeout(() => {
+      this.drawTrendChart();
+    }, 50);
+  }
+
+  updateCharts() {
+    this.updateFilters();
+    if (this.activeTab !== 'charts') return;
+
+    // Destroy existing chart instances to prevent canvas reuse errors
+    if (this.donutChartInstance) { this.donutChartInstance.destroy(); this.donutChartInstance = null; }
+    if (this.barChartInstance) { this.barChartInstance.destroy(); this.barChartInstance = null; }
+    if (this.trendChartInstance) { this.trendChartInstance.destroy(); this.trendChartInstance = null; }
+
+    // Run chart rendering in next tick to ensure canvas elements are loaded in DOM
+    setTimeout(() => {
+      this.drawDonutChart();
+      this.drawBarChart();
+      this.drawTrendChart();
+    }, 100);
+  }
+
+  private getChartData() {
+    const selectYearInt = parseInt(this.selectedYear) || 2568;
+    const calYear = selectYearInt - 543;
+
+    // 12 months array (Oct of calYear-1 to Sep of calYear)
+    const monthlySpent = new Array(12).fill(0);
+    const monthlyPlan = new Array(12).fill(0);
+    const categoriesData: { [key: string]: number } = {};
+
+    // Group actual spent entries
+    this.savedEntries.forEach(entry => {
+      if (!entry.date) return;
+      const date = new Date(entry.date);
+      if (isNaN(date.getTime())) return;
+      
+      const year = date.getFullYear();
+      const month = date.getMonth(); // 0-11
+      const amount = parseFloat(entry.withdraw) || 0;
+      
+      if (year === calYear - 1 && month >= 9) {
+        monthlySpent[month - 9] += amount;
+      } else if (year === calYear && month <= 8) {
+        monthlySpent[month + 3] += amount;
+      }
+    });
+
+    // Group planned rows
+    const savedPlan = localStorage.getItem(`allPlanRows-${this.selectedYear}`);
+    if (savedPlan) {
+      try {
+        const data = JSON.parse(savedPlan);
+        if (data.rows) {
+          data.rows.forEach((row: any) => {
+            const categoryName = row.item || 'อื่นๆ';
+            const totalPlan = parseFloat(row.total) || 0;
+            if (totalPlan > 0) {
+              categoriesData[categoryName] = (categoriesData[categoryName] || 0) + totalPlan;
+            }
+            
+            const months = ['oct', 'nov', 'dec', 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep'];
+            months.forEach((m, idx) => {
+              monthlyPlan[idx] += parseFloat(row[m]) || 0;
+            });
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Determine the last month with actual spending recorded
+    let lastActualMonthIndex = -1;
+    this.savedEntries.forEach(entry => {
+      if (!entry.date) return;
+      const date = new Date(entry.date);
+      if (isNaN(date.getTime())) return;
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      
+      if (year === calYear - 1 && month >= 9) {
+        const idx = month - 9;
+        if (idx > lastActualMonthIndex) lastActualMonthIndex = idx;
+      } else if (year === calYear && month <= 8) {
+        const idx = month + 3;
+        if (idx > lastActualMonthIndex) lastActualMonthIndex = idx;
+      }
+    });
+
+    return { monthlySpent, monthlyPlan, categoriesData, lastActualMonthIndex };
+  }
+
+  private drawDonutChart() {
+    const canvas = document.getElementById('donutChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const { categoriesData } = this.getChartData();
+    const labels = Object.keys(categoriesData);
+    const data = Object.values(categoriesData);
+
+    if (labels.length === 0) {
+      // Draw placeholder text if no data
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '14px Sarabun';
+        ctx.fillStyle = '#64748b';
+        ctx.textAlign = 'center';
+        ctx.fillText('ไม่มีข้อมูลแผนงบประมาณในปีนี้', canvas.width / 2, canvas.height / 2);
+      }
+      return;
+    }
+
+    const palette = ['#0f4c81', '#00b4d8', '#06d6a0', '#ffd60a', '#f59e0b', '#ef476f', '#a78bfa', '#64748b', '#6366f1', '#f43f5e', '#34d399'];
+
+    this.donutChartInstance = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: palette.slice(0, labels.length),
+          borderWidth: 2,
+          borderColor: '#ffffff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              font: { family: 'Sarabun', size: 11 },
+              boxWidth: 12
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const val = context.raw as number;
+                return ` ${context.label}: ${val.toLocaleString(undefined, {minimumFractionDigits: 2})} บาท`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  private drawBarChart() {
+    const canvas = document.getElementById('barChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const { monthlyPlan, monthlySpent } = this.getChartData();
+    const labels = ['ต.ค.', 'พ.ย.', 'ธ.ค.', 'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.'];
+
+    this.barChartInstance = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'แผนการใช้จ่าย',
+            data: monthlyPlan,
+            backgroundColor: 'rgba(15, 76, 129, 0.85)',
+            borderColor: '#0f4c81',
+            borderWidth: 1,
+            borderRadius: 4
+          },
+          {
+            label: 'จ่ายจริง',
+            data: monthlySpent,
+            backgroundColor: 'rgba(239, 71, 111, 0.85)',
+            borderColor: '#ef476f',
+            borderWidth: 1,
+            borderRadius: 4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: { font: { family: 'Sarabun', size: 11 } }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              font: { family: 'Sarabun', size: 10 },
+              callback: function(value) { return Number(value).toLocaleString(); }
+            }
+          },
+          x: {
+            ticks: { font: { family: 'Sarabun', size: 10 } }
+          }
+        }
+      }
+    });
+  }
+
+  private drawTrendChart() {
+    const canvas = document.getElementById('trendChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const { monthlyPlan, monthlySpent, lastActualMonthIndex } = this.getChartData();
+
+    let labels: string[];
+    let cumulativePlan: number[] = [];
+    let cumulativeSpent: any[] = [];
+    let forecastedSpent: any[] = [];
+
+    const totalAllocated = this.financialPlans.find(p => {
+      const pYear = p.date && p.date.length >= 4 ? p.date.slice(0, 4) : p.date;
+      return pYear === this.selectedYear;
+    });
+
+    if (this.trendViewMode === 'monthly') {
+      labels = ['ต.ค.', 'พ.ย.', 'ธ.ค.', 'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.'];
+      let planSum = 0;
+      monthlyPlan.forEach(val => {
+        planSum += val;
+        cumulativePlan.push(planSum);
+      });
+
+      cumulativeSpent = new Array(12).fill(null);
+      forecastedSpent = new Array(12).fill(null);
+      let spentSum = 0;
+
+      if (lastActualMonthIndex >= 0) {
+        // 1. Fill actual cumulative spend up to lastActualMonthIndex
+        for (let i = 0; i <= lastActualMonthIndex; i++) {
+          spentSum += monthlySpent[i];
+          cumulativeSpent[i] = spentSum;
+        }
+
+        // 2. Fill forecast trend line starting from the last actual spent point
+        forecastedSpent[lastActualMonthIndex] = spentSum;
+        const avgSpentPerMonth = spentSum / (lastActualMonthIndex + 1);
+        
+        for (let i = lastActualMonthIndex + 1; i < 12; i++) {
+          spentSum += avgSpentPerMonth;
+          forecastedSpent[i] = spentSum;
+        }
+      } else {
+        // If no spent data, start forecast from 0 based on average monthly plan
+        forecastedSpent[0] = 0;
+        const maxBudget = totalAllocated ? parseFloat(totalAllocated.name) || 0 : planSum || 1000000;
+        const step = maxBudget / 12;
+        for (let i = 0; i < 12; i++) {
+          forecastedSpent[i] = step * (i + 1);
+        }
+      }
+    } else {
+      // Quarterly mode
+      labels = ['Q1 (ต.ค.-ธ.ค.)', 'Q2 (ม.ค.-มี.ค.)', 'Q3 (เม.ย.-มิ.ย.)', 'Q4 (ก.ค.-ก.ย.)'];
+      
+      const q1Plan = monthlyPlan[0] + monthlyPlan[1] + monthlyPlan[2];
+      const q2Plan = q1Plan + monthlyPlan[3] + monthlyPlan[4] + monthlyPlan[5];
+      const q3Plan = q2Plan + monthlyPlan[6] + monthlyPlan[7] + monthlyPlan[8];
+      const q4Plan = q3Plan + monthlyPlan[9] + monthlyPlan[10] + monthlyPlan[11];
+      cumulativePlan = [q1Plan, q2Plan, q3Plan, q4Plan];
+
+      cumulativeSpent = new Array(4).fill(null);
+      forecastedSpent = new Array(4).fill(null);
+
+      const lastQIndex = lastActualMonthIndex >= 0 ? Math.floor(lastActualMonthIndex / 3) : -1;
+      
+      if (lastQIndex >= 0) {
+        // Calculate cumulative actual spent for each completed/active quarter
+        for (let q = 0; q <= lastQIndex; q++) {
+          const limit = Math.min(lastActualMonthIndex, (q * 3) + 2);
+          let sum = 0;
+          for (let i = 0; i <= limit; i++) {
+            sum += monthlySpent[i];
+          }
+          cumulativeSpent[q] = sum;
+        }
+
+        // Initialize forecast starting from the last actual spent point
+        forecastedSpent[lastQIndex] = cumulativeSpent[lastQIndex];
+        const totalMonthsCount = lastActualMonthIndex + 1;
+        const avgSpentPerMonth = cumulativeSpent[lastQIndex] / totalMonthsCount;
+        const avgSpentPerQuarter = avgSpentPerMonth * 3;
+
+        for (let q = lastQIndex + 1; q < 4; q++) {
+          forecastedSpent[q] = forecastedSpent[q - 1] + avgSpentPerQuarter;
+        }
+      } else {
+        // No spent data, start forecast from 0 using allocated budget divided by quarters
+        forecastedSpent[0] = 0;
+        const maxBudget = totalAllocated ? parseFloat(totalAllocated.name) || 0 : q4Plan || 1000000;
+        const step = maxBudget / 4;
+        for (let q = 0; q < 4; q++) {
+          forecastedSpent[q] = step * (q + 1);
+        }
+      }
+    }
+
+    this.trendChartInstance = new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'แผนใช้จ่ายสะสม',
+            data: cumulativePlan,
+            borderColor: '#0f4c81',
+            backgroundColor: 'rgba(15, 76, 129, 0.05)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.15
+          },
+          {
+            label: 'จ่ายจริงสะสม',
+            data: cumulativeSpent,
+            borderColor: '#059669',
+            backgroundColor: 'transparent',
+            borderWidth: 3,
+            pointBackgroundColor: '#059669',
+            pointRadius: 4,
+            tension: 0.15
+          },
+          {
+            label: 'ประมาณการแนวโน้ม (Forecast)',
+            data: forecastedSpent,
+            borderColor: '#ef476f',
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            borderDash: [6, 6],
+            pointRadius: 0,
+            tension: 0.15
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: { font: { family: 'Sarabun', size: 11 } }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const val = context.raw as number;
+                return ` ${context.dataset.label}: ${val.toLocaleString(undefined, {maximumFractionDigits: 0})} บาท`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              font: { family: 'Sarabun', size: 10 },
+              callback: function(value) { return Number(value).toLocaleString(); }
+            }
+          },
+          x: {
+            ticks: { font: { family: 'Sarabun', size: 10 } }
+          }
+        }
+      }
+    });
   }
 }

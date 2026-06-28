@@ -1,4 +1,4 @@
-import { Component, OnInit, DoCheck } from '@angular/core';
+import { Component, OnInit, DoCheck, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 export class PlanRecordPage implements OnInit, DoCheck {
   private lastLoadedRows: string = '';
   subItems: any;
+  isAdmin: boolean = false;
   availableYears: string[] = [];
   planYear: string = '';
   planRows: any[] = [];
@@ -33,7 +34,7 @@ export class PlanRecordPage implements OnInit, DoCheck {
     this.subRowsCollapsed = (this.planRows || []).map(() => this.allSubRowsCollapsed);
   }
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private cdr: ChangeDetectorRef) {}
 
   ngDoCheck() {
     // Auto-reload data if storage has changed for the current year
@@ -77,10 +78,14 @@ export class PlanRecordPage implements OnInit, DoCheck {
 
   ngOnInit() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (!user || !user.isAdmin) {
-      this.router.navigate(['/login']); // or show an error
+    if (!user || !user.username) {
+      this.router.navigate(['/home']);
       return;
     }
+    const username = (user.username || '').toString().trim().toLowerCase();
+    this.isAdmin = !!user.isAdmin || username === 'admin';
+    this.cdr.detectChanges();
+
     this.availableYears = this.getAllSavedYears();
     if (this.availableYears.length > 0) {
       this.planYear = this.availableYears.sort().reverse()[0];
@@ -91,6 +96,15 @@ export class PlanRecordPage implements OnInit, DoCheck {
     }
     this.subRowsCollapsed = this.planRows.map(() => true);
     this.calculateSummary();
+  }
+
+  ionViewWillEnter() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user && user.username) {
+      const username = (user.username || '').toString().trim().toLowerCase();
+      this.isAdmin = !!user.isAdmin || username === 'admin';
+      this.cdr.detectChanges();
+    }
   }
 
   getAllSavedYears(): string[] {
