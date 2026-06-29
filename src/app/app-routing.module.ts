@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { AdminGuard, AuthGuard } from './admin-auth.guard';
-import { NavigatorPage } from './navigator/navigator.page';
 
 const routes: Routes = [
   {
@@ -10,7 +9,7 @@ const routes: Routes = [
   },
   {
     path: 'navigator',
-    component: NavigatorPage,
+    loadChildren: () => import('./navigator/navigator.module').then( m => m.NavigatorPageModule),
     canActivate: [AuthGuard]
   },
   {
@@ -20,28 +19,28 @@ const routes: Routes = [
   },
   {
     path: 'financial-plans',
-    loadChildren: () => import('./financial-plans/financial-plans.module').then( m => m.FinancialPlansPageModule),
-    canActivate: [AdminGuard]
+    redirectTo: 'navigator/financial-plans',
+    pathMatch: 'full'
   },
   {
     path: 'all-plan',
-    loadChildren: () => import('./all-plan/all-plan.module').then( m => m.AllPlanPageModule),
-    canActivate: [AdminGuard]
+    redirectTo: 'navigator/all-plan',
+    pathMatch: 'full'
   },
   {
     path: 'plan-record',
-    loadChildren: () => import('./plan-record/plan-record.module').then( m => m.PlanRecordPageModule),
-    canActivate: [AuthGuard]
+    redirectTo: 'navigator/plan-record',
+    pathMatch: 'full'
   },
   {
     path: 'actual-paid',
-    loadChildren: () => import('./actual-paid/actual-paid.module').then( m => m.ActualPaidPageModule),
-    canActivate: [AdminGuard]
+    redirectTo: 'navigator/actual-paid',
+    pathMatch: 'full'
   },
   {
     path: 'records',
-    loadChildren: () => import('./records/records.module').then( m => m.RecordsPageModule),
-    canActivate: [AuthGuard]
+    redirectTo: 'navigator/records',
+    pathMatch: 'full'
   },
 ];
 

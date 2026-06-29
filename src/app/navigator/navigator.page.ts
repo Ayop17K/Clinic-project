@@ -12,14 +12,187 @@ import { HttpClient } from '@angular/common/http';
 export class NavigatorPage implements OnInit {
   isAdmin: boolean = false;
 
-  constructor(private router: Router, private http: HttpClient, private cdr: ChangeDetectorRef) { }
+  // Dashboard properties
+  financialPlans: any[] = [];
+  savedEntries: any[] = [];
+  availableYears: string[] = [];
+  selectedYear: string = '';
+
+  // Dashboard stats
+  totalBudget: number = 0;
+  totalSpent: number = 0;
+  remainingBudget: number = 0;
+  spentPercentage: number = 0;
+
+  // Dashboard breakdown
+  monthlySpent: { monthName: string, amount: number }[] = [];
+  recentTransactions: any[] = [];
+  categorySpent: { name: string, amount: number }[] = [];
+
+  constructor(public router: Router, private http: HttpClient, private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.checkUserRole();
+    this.loadDashboardData();
   }
 
   ionViewWillEnter() {
     this.checkUserRole();
+    this.loadDashboardData();
+  }
+
+  isDashboardActive(): boolean {
+    return this.router.url === '/navigator' || this.router.url === '/navigator/dashboard';
+  }
+
+  isRouteActive(route: string): boolean {
+    return this.router.url.includes(route);
+  }
+
+  getFiscalYear(dateStr: string): string {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      if (/^\d{4}$/.test(dateStr)) {
+        const num = parseInt(dateStr, 10);
+        return num > 2100 ? num.toString() : (num + 543).toString();
+      }
+      return dateStr;
+    }
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // 1-12
+    const fiscalCalendarYear = month >= 10 ? year + 1 : year;
+    return (fiscalCalendarYear + 543).toString();
+  }
+
+  getBuddhistDate(dateStr: string): string {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    const buddhistYear = date.getFullYear() + 543;
+    const monthNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+    const day = date.getDate();
+    const month = monthNames[date.getMonth()];
+    const hour = date.getHours().toString().padStart(2, '0');
+    const min = date.getMinutes().toString().padStart(2, '0');
+    return `${day} ${month} ${buddhistYear}, ${hour}:${min}`;
+  }
+
+  loadDashboardData() {
+    this.http.get<any[]>('http://localhost:3000/api/menu6-entries').subscribe({
+      next: (entries) => {
+        this.savedEntries = entries || [];
+        this.fetchFinancialPlans();
+      },
+      error: (err) => {
+        console.error('Error loading entries:', err);
+        const entries = localStorage.getItem('menu6_entries');
+        this.savedEntries = entries ? JSON.parse(entries) : [];
+        this.fetchFinancialPlans();
+      }
+    });
+  }
+
+  fetchFinancialPlans() {
+    this.http.get<any[]>('http://localhost:3000/api/financial-plans').subscribe({
+      next: (plans) => {
+        this.financialPlans = plans || [];
+        this.processDashboardStats();
+      },
+      error: (err) => {
+        console.error('Error loading plans:', err);
+        const plans = localStorage.getItem('financial_plans');
+        this.financialPlans = plans ? JSON.parse(plans) : [];
+        this.processDashboardStats();
+      }
+    });
+  }
+
+  processDashboardStats() {
+    const yearsSet = new Set<string>();
+    this.financialPlans.forEach(plan => {
+      if (plan.date) {
+        const y = plan.date.length >= 4 ? plan.date.slice(0, 4) : plan.date;
+        if (y) yearsSet.add(y);
+      }
+    });
+    this.availableYears = Array.from(yearsSet).sort();
+
+    if (!this.selectedYear && this.availableYears.length > 0) {
+      this.selectedYear = this.availableYears[this.availableYears.length - 1];
+    }
+
+    if (!this.selectedYear) {
+      this.totalBudget = 0;
+      this.totalSpent = 0;
+      this.remainingBudget = 0;
+      this.spentPercentage = 0;
+      this.monthlySpent = [];
+      this.recentTransactions = [];
+      this.categorySpent = [];
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const activePlan = this.financialPlans.find(plan => {
+      const y = plan.date && plan.date.length >= 4 ? plan.date.slice(0, 4) : plan.date;
+      return y === this.selectedYear;
+    });
+    this.totalBudget = activePlan ? (parseFloat(activePlan.name) || 0) : 0;
+
+    const activeEntries = this.savedEntries.filter(entry => {
+      return this.getFiscalYear(entry.date) === this.selectedYear;
+    });
+
+    this.totalSpent = activeEntries.reduce((sum, entry) => {
+      const val = parseFloat(entry.withdraw) || 0;
+      return sum + val;
+    }, 0);
+
+    this.remainingBudget = this.totalBudget - this.totalSpent;
+    this.spentPercentage = this.totalBudget > 0 ? (this.totalSpent / this.totalBudget) * 100 : 0;
+
+    const fiscalMonths = ['ต.ค.', 'พ.ย.', 'ธ.ค.', 'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.'];
+    const monthlySum = new Array(12).fill(0);
+
+    activeEntries.forEach(entry => {
+      if (!entry.date) return;
+      const d = new Date(entry.date);
+      if (isNaN(d.getTime())) return;
+      const m = d.getMonth() + 1;
+      const mIdx = (m >= 10) ? (m - 10) : (m + 2);
+      if (mIdx >= 0 && mIdx < 12) {
+        monthlySum[mIdx] += (parseFloat(entry.withdraw) || 0);
+      }
+    });
+
+    this.monthlySpent = fiscalMonths.map((name, idx) => ({
+      monthName: name,
+      amount: monthlySum[idx]
+    }));
+
+    const sortedEntries = activeEntries.slice().sort((a, b) => {
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
+    this.recentTransactions = sortedEntries.slice(0, 5);
+
+    const catMap = new Map<string, number>();
+    activeEntries.forEach(entry => {
+      const type = entry.withdrawType || 'เงินบำรุง';
+      const val = parseFloat(entry.withdraw) || 0;
+      catMap.set(type, (catMap.get(type) || 0) + val);
+    });
+    this.categorySpent = Array.from(catMap.entries()).map(([name, amount]) => ({
+      name: name,
+      amount: amount
+    }));
+
+    this.cdr.detectChanges();
+  }
+
+  onYearChange(event: any) {
+    this.selectedYear = event.detail.value;
+    this.processDashboardStats();
   }
 
   checkUserRole() {
@@ -392,12 +565,3 @@ export class NavigatorPage implements OnInit {
   }
 
 }
-
-@NgModule({
-  declarations: [NavigatorPage],
-  imports: [
-    IonicModule,
-    RouterModule
-  ]
-})
-export class NavigatorPageModule {}

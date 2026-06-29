@@ -208,67 +208,123 @@ deletePlan(index: number) {
 
   exportCSV() {
     const exportYears = this.selectedYear ? [this.selectedYear] : this.recordYears;
-    let allRows: any[] = [];
-
-    // Header เดียว
-    const header = [
-        'ปีงบประมาณ', 'รายการ', 'เบิก', 'แหล่งงบประมาณ', 'วันที่',
-        'ประเภทข้อมูล', 'งบตั้งต้น', 'งบคงเหลือ'
-    ];
-    allRows.push(header);
+    
+    let html = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">
+        <style>
+          body { font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; }
+          .title { font-size: 16px; font-weight: bold; text-align: center; color: #0f4c81; height: 35px; }
+          .subtitle { font-size: 12px; text-align: center; color: #555555; height: 25px; }
+          table { border-collapse: collapse; width: 100%; border: 1px solid #cbd5e1; }
+          th { background-color: #0f4c81; color: white; border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; text-align: center; font-size: 12px; }
+          td { border: 1px solid #cbd5e1; padding: 8px; font-size: 11px; }
+          .text-center { text-align: center; }
+          .text-right { text-align: right; }
+          .text-left { text-align: left; }
+          .font-bold { font-weight: bold; }
+          .header-row { height: 30px; }
+          .data-row { height: 24px; }
+          .year-divider { background-color: #e2e8f0; font-weight: bold; height: 30px; color: #0f4c81; }
+          .plan-row { background-color: #ecfdf5; font-weight: bold; color: #047857; }
+          .record-row { background-color: #ffffff; }
+        </style>
+      </head>
+      <body>
+        <table>
+          <tr>
+            <td colspan="8" class="title">รายงานสรุปงบประมาณและรายการเบิกจ่ายงบประมาณ</td>
+          </tr>
+          <tr>
+            <td colspan="8" class="subtitle">โรงพยาบาลส่งเสริมสุขภาพตำบลหนองปลิง อำเภอเมือง จังหวัดกำแพงเพชร</td>
+          </tr>
+          <tr>
+            <td colspan="8" class="subtitle">ข้อมูล ณ วันที่: ${new Date().toLocaleDateString('th-TH')}</td>
+          </tr>
+          <tr class="header-row">
+            <th>ปีงบประมาณ</th>
+            <th>ประเภทข้อมูล</th>
+            <th>รายการ / คำอธิบาย</th>
+            <th>งบจัดสรรตั้งต้น (บาท)</th>
+            <th>ยอดเบิกจ่าย (บาท)</th>
+            <th>งบประมาณคงเหลือ (บาท)</th>
+            <th>แหล่งงบประมาณ</th>
+            <th>วันที่ทำรายการ</th>
+          </tr>
+    `;
 
     exportYears.forEach(year => {
-        const buddhistYear = this.getBuddhistYear(year);
+        const buddhistYear = 'พ.ศ. ' + this.getBuddhistYear(year);
 
-        // Records
-        const records = this.savedEntries
-            .filter(entry => {
-                if (!entry.date) return false;
-                const entryYear = entry.date.length >= 4 ? entry.date.slice(0, 4) : entry.date;
-                return entryYear === year;
-            })
-            .map(entry => [
-                buddhistYear,
-                entry.itemName || '',
-                entry.withdraw || '',
-                entry.sourceOfFunds || 'เงินบำรุง',
-                this.getBuddhistDate(entry.date),
-                '', '', '' // ช่องว่างสำหรับ financial plan
-            ]);
+        // Year Group Divider
+        html += `
+          <tr class="year-divider">
+            <td colspan="8" style="font-weight: bold; background-color: #e2e8f0; color: #0f4c81; font-size: 12px; padding: 10px;">ปีงบประมาณ ${buddhistYear}</td>
+          </tr>
+        `;
 
-        // Financial Plans
-        const plans = this.financialPlans
-            .filter(plan => {
-                const planYear = plan.date && plan.date.length >= 4 ? plan.date.slice(0, 4) : plan.date;
-                return planYear === year;
-            })
-            .map(plan => [
-                buddhistYear,
-                '', '', '', '',
-                'งบจัดสรร',
-                plan.name,
-                this.getRemainingBudget(plan)
-            ]);
+        // Filter financial plans for this year
+        const plans = this.financialPlans.filter(plan => {
+            const planYear = plan.date && plan.date.length >= 4 ? plan.date.slice(0, 4) : plan.date;
+            return planYear === year;
+        });
 
-        // รวมข้อมูลทั้งสองกลุ่ม
-        if (records.length > 0) allRows.push(...records);
-        if (plans.length > 0) allRows.push(...plans);
+        // Filter records/entries for this year
+        const records = this.savedEntries.filter(entry => {
+            if (!entry.date) return false;
+            const entryYear = entry.date.length >= 4 ? entry.date.slice(0, 4) : entry.date;
+            return entryYear === year;
+        });
 
-        // เว้นแถวว่างระหว่างปี (ถ้าไม่ใช่ปีสุดท้าย)
-        allRows.push(['', '', '', '', '', '', '', '']);
+        // Render Plans first
+        plans.forEach(plan => {
+            const budgetVal = parseFloat(plan.name) || 0;
+            const remainingVal = this.getRemainingBudget(plan);
+            html += `
+              <tr class="data-row plan-row">
+                <td class="text-center">${buddhistYear}</td>
+                <td class="text-center" style="font-weight: bold;">งบจัดสรร</td>
+                <td class="text-left" style="font-weight: bold;">งบจัดสรรประจำปี</td>
+                <td class="text-right" style="font-weight: bold;">${budgetVal.toLocaleString('th-TH')}</td>
+                <td class="text-right">-</td>
+                <td class="text-right" style="font-weight: bold;">${remainingVal.toLocaleString('th-TH')}</td>
+                <td class="text-center">เงินบำรุง</td>
+                <td class="text-center">-</td>
+              </tr>
+            `;
+        });
+
+        // Render Records next
+        records.forEach(entry => {
+            const withdrawVal = parseFloat(entry.withdraw) || 0;
+            html += `
+              <tr class="data-row record-row">
+                <td class="text-center">${buddhistYear}</td>
+                <td class="text-center" style="color: #64748b;">รายการถอนเงิน</td>
+                <td class="text-left">${entry.itemName || ''}</td>
+                <td class="text-right">-</td>
+                <td class="text-right" style="color: #b91c1c;">${withdrawVal.toLocaleString('th-TH')}</td>
+                <td class="text-right">-</td>
+                <td class="text-center">${entry.sourceOfFunds || 'เงินบำรุง'}</td>
+                <td class="text-center">${this.getBuddhistDate(entry.date)}</td>
+              </tr>
+            `;
+        });
     });
 
-    // Export CSV
-    const csvContent = allRows
-        .map(row => row.map((val: string) => `"${val}"`).join(','))
-        .join('\r\n');
+    html += `
+        </table>
+      </body>
+      </html>
+    `;
 
     const BOM = '\uFEFF';
-    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([BOM + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'records_and_financial_plans.csv';
+    a.download = `รายงานงบประมาณ_${this.selectedYear ? this.selectedYear : 'ทั้งหมด'}.xls`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

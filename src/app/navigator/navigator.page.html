@@ -1,123 +1,201 @@
-<!-- Navigator Page — Admin Dashboard -->
+<!-- Navigator Page — Dashboard Layout with Sidebar -->
 
-<ion-header [translucent]="true">
-  <ion-toolbar class="nav-toolbar">
-    <ion-title>
-      <ion-icon name="grid-outline" class="toolbar-icon"></ion-icon>
-      เมนูจัดการระบบ
-    </ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="onLogout()" fill="solid" color="danger" class="logout-btn">
-        <ion-icon name="log-out-outline" slot="start"></ion-icon>
-        ออกจากระบบ
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true" class="nav-content">
-  <!-- Hospital Banner -->
-  <div class="hospital-banner">
-    <div class="banner-inner">
-      <img src="assets/icon/favicon.png" alt="logo" class="banner-logo" />
-      <div class="banner-text">
-        <h2 class="banner-title">โรงพยาบาลส่งเสริมสุขภาพตำบลหนองปลิง</h2>
-        <p class="banner-sub">อำเภอเมือง จังหวัดกำแพงเพชร</p>
-        <p class="banner-sub">สังกัด องค์การบริหารส่วนจังหวัดกำแพงเพชร</p>
+<div class="dashboard-wrapper">
+  <!-- Left Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="assets/icon/favicon.png" alt="logo" class="brand-logo" />
+      <div class="brand-text">
+        <h3>รพ.สต.หนองปลิง</h3>
+        <p>ระบบจัดการงบประมาณ</p>
       </div>
     </div>
-  </div>
 
-  <!-- Menu Cards -->
-  <div class="menu-container">
-    <div class="section-label">
-      <ion-icon name="apps-outline"></ion-icon>
-      เลือกเมนูที่ต้องการ
+    <nav class="sidebar-nav">
+      <!-- Dashboard Link -->
+      <a [routerLink]="['/navigator']" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active-link" class="nav-item">
+        <ion-icon name="apps-outline"></ion-icon>
+        <span>ภาพรวมระบบ (Dashboard)</span>
+      </a>
+      
+      <!-- Manage Budgets (Admin only) -->
+      <a [routerLink]="['/navigator/financial-plans']" routerLinkActive="active-link" class="nav-item" *ngIf="isAdmin">
+        <ion-icon name="cash-outline"></ion-icon>
+        <span>จัดการงบจัดสรร (Financial)</span>
+      </a>
+      
+      <!-- Add Expense Plan (Admin only) -->
+      <a [routerLink]="['/navigator/all-plan']" routerLinkActive="active-link" class="nav-item" *ngIf="isAdmin">
+        <ion-icon name="create-outline"></ion-icon>
+        <span>เพิ่มแผนการใช้จ่าย</span>
+      </a>
+      
+      <!-- Budget Tables (All logged in users) -->
+      <a [routerLink]="['/navigator/plan-record']" routerLinkActive="active-link" class="nav-item">
+        <ion-icon name="document-text-outline"></ion-icon>
+        <span>ตารางงบประมาณ (Record)</span>
+      </a>
+      
+      <!-- Expense Records (All logged in users) -->
+      <a [routerLink]="['/navigator/records']" routerLinkActive="active-link" class="nav-item">
+        <ion-icon name="pie-chart-outline"></ion-icon>
+        <span>กราฟและวิเคราะห์ (Charts)</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button *ngIf="isAdmin" class="btn-simulate" (click)="simulate5YearsData()">
+        <ion-icon name="server-outline"></ion-icon>
+        <span>จำลองข้อมูลตัวอย่าง 5 ปี</span>
+      </button>
+      <button class="btn-logout" (click)="onLogout()">
+        <ion-icon name="log-out-outline"></ion-icon>
+        <span>ออกจากระบบ</span>
+      </button>
     </div>
+  </aside>
 
-    <div class="menu-grid">
+  <!-- Right Main Panel -->
+  <main class="main-content">
+    
+    <!-- Show Dashboard Overview when active -->
+    <ion-content class="dashboard-ion-content" *ngIf="isDashboardActive()">
+      <div class="dashboard-overview">
+        <div class="overview-header">
+          <div class="header-title">
+            <h1>แดชบอร์ดภาพรวมการใช้งบประมาณ</h1>
+            <p>สรุปข้อมูลทางการเงินของ รพ.สต.หนองปลิง ประจำปีงบประมาณ</p>
+          </div>
+          
+          <div class="year-selector">
+            <span class="label">ปีงบประมาณ พ.ศ. </span>
+            <ion-select [value]="selectedYear" (ionChange)="onYearChange($event)" interface="popover" class="year-select">
+              <ion-select-option *ngFor="let year of availableYears" [value]="year">{{ year }}</ion-select-option>
+            </ion-select>
+          </div>
+        </div>
 
-      <!-- Card 1: เพิ่มข้อมูลแผนการใช้จ่าย -->
-      <div class="menu-card" [routerLink]="['/all-plan']" *ngIf="isAdmin">
-        <div class="card-icon-wrap" style="background: linear-gradient(135deg, #0f4c81, #0077b6);">
-          <ion-icon name="create-outline"></ion-icon>
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card total-budget">
+            <div class="card-header">
+              <span>งบประมาณจัดสรรประจำปี</span>
+              <ion-icon name="wallet-outline" class="icon-budget"></ion-icon>
+            </div>
+            <div class="card-value">{{ totalBudget | number }} <small>บาท</small></div>
+            <div class="card-footer">
+              <span class="footer-desc">งบประมาณตั้งต้นจากองค์การบริหารส่วนจังหวัด</span>
+            </div>
+          </div>
+
+          <div class="stat-card total-spent">
+            <div class="card-header">
+              <span>ยอดเบิกจ่ายสะสม</span>
+              <ion-icon name="cash-outline" class="icon-spent"></ion-icon>
+            </div>
+            <div class="card-value">{{ totalSpent | number }} <small>บาท</small></div>
+            <div class="card-footer">
+              <span class="footer-desc">เบิกจ่ายผ่านระบบรายการถอนเงิน</span>
+            </div>
+          </div>
+
+          <div class="stat-card remaining-budget" [class.negative]="remainingBudget < 0">
+            <div class="card-header">
+              <span>งบประมาณคงเหลือ</span>
+              <ion-icon name="calculator-outline" class="icon-remaining"></ion-icon>
+            </div>
+            <div class="card-value">{{ remainingBudget | number }} <small>บาท</small></div>
+            <div class="card-footer">
+              <span class="footer-desc">งบประมาณคงเหลือสุทธิ</span>
+            </div>
+          </div>
+
+          <div class="stat-card spent-percentage">
+            <div class="card-header">
+              <span>อัตราการเบิกจ่ายงบประมาณ</span>
+              <ion-icon name="trending-up-outline" class="icon-rate"></ion-icon>
+            </div>
+            <div class="card-value">{{ spentPercentage | number:'1.1-2' }}%</div>
+            <div class="card-footer">
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" [style.width.%]="spentPercentage" [class.high]="spentPercentage > 90"></div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="card-body">
-          <div class="card-title">เพิ่มข้อมูล</div>
-          <div class="card-title-th">แผนการใช้จ่าย</div>
-          <div class="card-desc">กรอกและบันทึกแผนงบประมาณประจำปี</div>
-        </div>
-        <div class="card-arrow">
-          <ion-icon name="chevron-forward-outline"></ion-icon>
+
+        <!-- Dashboard Sections -->
+        <div class="sections-grid">
+          
+          <!-- Left: Monthly Spending List -->
+          <div class="section-card monthly-spending">
+            <div class="section-title">
+              <h3>สถิติยอดเบิกจ่ายตามปีงบประมาณรายเดือน</h3>
+              <p>จำแนกตาม 12 เดือนทางปีงบประมาณ (ต.ค. - ก.ย.)</p>
+            </div>
+            
+            <div class="monthly-bars">
+              <div class="month-bar-row" *ngFor="let item of monthlySpent">
+                <span class="month-label">{{ item.monthName }}</span>
+                <div class="bar-track">
+                  <div class="bar-fill" [style.width.%]="(totalBudget > 0 ? (item.amount / (totalBudget / 8) * 100) : 0) > 100 ? 100 : (totalBudget > 0 ? (item.amount / (totalBudget / 8) * 100) : 0)"></div>
+                </div>
+                <span class="month-value">{{ item.amount | number }} บาท</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Category Breakdown & Recent Transactions -->
+          <div class="section-card-group">
+            
+            <!-- Category list -->
+            <div class="section-card category-breakdown">
+              <div class="section-title">
+                <h3>ยอดเงินเบิกแยกตามแหล่งงบประมาณ</h3>
+              </div>
+              <div class="category-list">
+                <div class="category-item" *ngFor="let item of categorySpent">
+                  <div class="cat-info">
+                    <span class="cat-name">{{ item.name }}</span>
+                    <span class="cat-value">{{ item.amount | number }} บาท</span>
+                  </div>
+                  <div class="cat-progress-track">
+                    <div class="cat-progress-fill" [style.width.%]="totalSpent > 0 ? (item.amount / totalSpent * 100) : 0"></div>
+                  </div>
+                </div>
+                <div class="category-empty" *ngIf="categorySpent.length === 0">
+                  ไม่มีข้อมูลจำแนกประเภทในปีนี้
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="section-card recent-transactions">
+              <div class="section-title">
+                <h3>รายการเบิกจ่ายล่าสุด</h3>
+              </div>
+              <div class="transactions-list">
+                <div class="transaction-item" *ngFor="let item of recentTransactions">
+                  <div class="tx-details">
+                    <span class="tx-name">{{ item.itemName }}</span>
+                    <span class="tx-date">{{ getBuddhistDate(item.date) }}</span>
+                  </div>
+                  <span class="tx-amount">-{{ item.withdraw | number }} บ.</span>
+                </div>
+                <span class="transaction-empty" *ngIf="recentTransactions.length === 0">
+                  ไม่มีรายการทำธุรกรรมในปีนี้
+                </span>
+              </div>
+            </div>
+            
+          </div>
+
         </div>
       </div>
+    </ion-content>
 
-      <!-- Card 2: เรียกดูข้อมูลแผนการใช้จ่าย (กราฟและวิเคราะห์) -->
-      <div class="menu-card" [routerLink]="['/records']">
-        <div class="card-icon-wrap" style="background: linear-gradient(135deg, #0077b6, #00b4d8);">
-          <ion-icon name="pie-chart-outline"></ion-icon>
-        </div>
-        <div class="card-body">
-          <div class="card-title">เรียกดูข้อมูล</div>
-          <div class="card-title-th">กราฟและวิเคราะห์</div>
-          <div class="card-desc">ดูสรุปรายงานในรูปแบบกราฟและแนวโน้มสะสม</div>
-        </div>
-        <div class="card-arrow">
-          <ion-icon name="chevron-forward-outline"></ion-icon>
-        </div>
-      </div>
-
-      <!-- Card 3: งบจัดสรร -->
-      <div class="menu-card" [routerLink]="['/financial-plans']" *ngIf="isAdmin">
-        <div class="card-icon-wrap" style="background: linear-gradient(135deg, #06d6a0, #0077b6);">
-          <ion-icon name="cash-outline"></ion-icon>
-        </div>
-        <div class="card-body">
-          <div class="card-title">จัดการงบจัดสรร</div>
-          <div class="card-title-th">Financial Plans</div>
-          <div class="card-desc">เพิ่มและดูงบจัดสรรตั้งต้นแต่ละปี</div>
-        </div>
-        <div class="card-arrow">
-          <ion-icon name="chevron-forward-outline"></ion-icon>
-        </div>
-      </div>
-
-      <!-- Card 4: ตารางสรุปแผนงบประมาณ -->
-      <div class="menu-card" [routerLink]="['/plan-record']">
-        <div class="card-icon-wrap" style="background: linear-gradient(135deg, #ffd60a, #f59e0b);">
-          <ion-icon name="document-text-outline" style="color: #92400e;"></ion-icon>
-        </div>
-        <div class="card-body">
-          <div class="card-title" style="color: #92400e;">ตารางงบประมาณ</div>
-          <div class="card-title-th" style="color: #78350f;">Plan Record</div>
-          <div class="card-desc">ดูตารางสรุปแผนงบประมาณรายเดือนทั้งหมด</div>
-        </div>
-        <div class="card-arrow">
-          <ion-icon name="chevron-forward-outline"></ion-icon>
-        </div>
-      </div>
-
-      <!-- Card 5: Simulate Data -->
-      <div class="menu-card" (click)="simulate5YearsData()" style="grid-column: span 2; border: 1.5px dashed #00b4d8; background: #f0f9ff;" *ngIf="isAdmin">
-        <div class="card-icon-wrap" style="background: linear-gradient(135deg, #00b4d8, #0f4c81);">
-          <ion-icon name="server-outline"></ion-icon>
-        </div>
-        <div class="card-body">
-          <div class="card-title" style="color: #0f4c81;">จำลองข้อมูลตัวอย่าง 5 ปี</div>
-          <div class="card-title-th" style="color: #0077b6;">Simulate 5 Years Data</div>
-          <div class="card-desc">สุ่มสร้างข้อมูลงบประมาณและแผนการใช้จ่ายย้อนหลัง พ.ศ. 2564 - 2568</div>
-        </div>
-        <div class="card-arrow">
-          <ion-icon name="play-forward-outline" style="color: #00b4d8;"></ion-icon>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Footer info -->
-  <div class="nav-footer">
-    <ion-icon name="time-outline"></ion-icon>
-    <span>ระบบงบประมาณ รพ.สต.หนองปลิง — ข้อมูล ณ วันนี้</span>
-  </div>
-</ion-content>
+    <!-- Nested Views Outlet -->
+    <router-outlet *ngIf="!isDashboardActive()"></router-outlet>
+    
+  </main>
+</div>

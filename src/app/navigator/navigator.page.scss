@@ -1,227 +1,597 @@
-// navigator.page.scss — Admin Dashboard Styles
+// navigator.page.scss — Dashboard and Sidebar Styles
 
-.nav-toolbar {
-  --background: #0f4c81;
-  --color: #ffffff;
-
-  .toolbar-icon {
-    vertical-align: middle;
-    margin-right: 8px;
-    color: #ffd60a;
-  }
-
-  .logout-btn {
-    --border-radius: 8px;
-    font-size: 0.9em;
-    margin-right: 8px;
-  }
+.dashboard-wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: #f3f4f6;
+  font-family: 'Inter', 'Outfit', 'Helvetica Neue', sans-serif;
 }
 
-.nav-content {
-  --background: #f0f4f8;
-}
-
-// ---- Hospital Banner ----
-.hospital-banner {
-  background: linear-gradient(135deg, #0f4c81 0%, #0077b6 100%);
-  padding: 24px 20px;
+// ---- LEFT SIDEBAR ----
+.sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: linear-gradient(180deg, #0f4c81 0%, #1e3a8a 100%);
   color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
 
-  .banner-inner {
-    max-width: 700px;
-    margin: 0 auto;
+  .sidebar-brand {
+    padding: 24px 20px;
     display: flex;
     align-items: center;
-    gap: 20px;
-  }
+    gap: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
-  .banner-logo {
-    width: 72px;
-    height: 72px;
-    border-radius: 18px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-    flex-shrink: 0;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-  }
-
-  .banner-text {
-    .banner-title {
-      font-size: 1.25em;
-      font-weight: 700;
-      margin: 0 0 4px;
-      line-height: 1.3;
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: white;
+      padding: 2px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
-    .banner-sub {
-      font-size: 0.92em;
-      color: rgba(255, 255, 255, 0.8);
-      margin: 2px 0;
-    }
-  }
-}
 
-// ---- Menu Container ----
-.menu-container {
-  max-width: 700px;
-  margin: 24px auto;
-  padding: 0 16px;
-}
-
-.section-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.9em;
-  font-weight: 600;
-  color: #64748b;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  margin-bottom: 16px;
-  padding-left: 4px;
-
-  ion-icon {
-    color: #0077b6;
-    font-size: 1.1em;
-  }
-}
-
-// ---- Card Grid ----
-.menu-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-// ---- Menu Card ----
-.menu-card {
-  background: #ffffff;
-  border-radius: 18px;
-  box-shadow: 0 4px 16px rgba(15, 76, 129, 0.1);
-  border: 1px solid rgba(15, 76, 129, 0.08);
-  padding: 20px 16px 20px 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  text-decoration: none;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(15, 76, 129, 0.03), transparent);
-    opacity: 0;
-    transition: opacity 0.25s;
-  }
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 32px rgba(15, 76, 129, 0.18);
-
-    &::before { opacity: 1; }
-
-    .card-arrow ion-icon {
-      transform: translateX(4px);
-      color: #0f4c81;
+    .brand-text {
+      h3 {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        color: #ffffff;
+      }
+      p {
+        margin: 2px 0 0;
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
+      }
     }
   }
 
-  &:active {
-    transform: translateY(-1px);
-  }
-}
-
-.card-icon-wrap {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-
-  ion-icon {
-    font-size: 1.6em;
-    color: #ffffff;
-  }
-}
-
-.card-body {
-  flex: 1;
-  min-width: 0;
-
-  .card-title {
-    font-size: 1em;
-    font-weight: 700;
-    color: #0f4c81;
-    line-height: 1.2;
-  }
-
-  .card-title-th {
-    font-size: 0.9em;
-    font-weight: 600;
-    color: #0077b6;
-    margin-bottom: 4px;
-  }
-
-  .card-desc {
-    font-size: 0.8em;
-    color: #64748b;
-    line-height: 1.4;
-  }
-}
-
-.card-arrow {
-  flex-shrink: 0;
-
-  ion-icon {
-    font-size: 1.3em;
-    color: #cbd5e1;
-    transition: all 0.25s ease;
-  }
-}
-
-// ---- Footer ----
-.nav-footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 16px;
-  font-size: 0.85em;
-  color: #94a3b8;
-
-  ion-icon {
-    color: #00b4d8;
-  }
-}
-
-// ---- Responsive ----
-@media (max-width: 480px) {
-  .menu-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .hospital-banner .banner-inner {
+  .sidebar-nav {
+    flex: 1;
+    padding: 24px 12px;
+    display: flex;
     flex-direction: column;
+    gap: 8px;
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+
+      ion-icon {
+        font-size: 1.3rem;
+        transition: transform 0.2s ease;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+        
+        ion-icon {
+          transform: scale(1.1);
+        }
+      }
+
+      &.active-link {
+        background: #0077b6;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 119, 182, 0.35);
+
+        ion-icon {
+          color: #ffd60a;
+        }
+      }
+    }
+  }
+
+  .sidebar-footer {
+    padding: 20px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .btn-simulate {
+      background: rgba(0, 180, 216, 0.15);
+      border: 1.5px dashed #00b4d8;
+      color: #00b4d8;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+
+      ion-icon {
+        font-size: 1.15rem;
+      }
+
+      &:hover {
+        background: #00b4d8;
+        color: #ffffff;
+      }
+    }
+
+    .btn-logout {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #f87171;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+
+      &:hover {
+        background: #ef4444;
+        color: #ffffff;
+        border-color: #ef4444;
+      }
+    }
+  }
+}
+
+// ---- MAIN CONTENT AREA ----
+.main-content {
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  background-color: #f8fafc;
+}
+
+.dashboard-ion-content {
+  --background: #f8fafc;
+  height: 100%;
+  width: 100%;
+}
+
+// ---- DASHBOARD OVERVIEW VIEWS ----
+.dashboard-overview {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+  box-sizing: border-box;
+
+  .overview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    .header-title {
+      h1 {
+        margin: 0;
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #0f172a;
+      }
+      p {
+        margin: 4px 0 0;
+        font-size: 0.95rem;
+        color: #64748b;
+      }
+    }
+
+    .year-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: white;
+      padding: 6px 16px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+
+      .label {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #475569;
+      }
+
+      .year-select {
+        --padding-start: 4px;
+        --padding-end: 4px;
+        font-weight: 800;
+        color: #0f4c81;
+      }
+    }
+  }
+}
+
+// KPI Stats Grid
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+
+  .stat-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+    border: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 140px;
+    box-sizing: border-box;
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #64748b;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+
+      ion-icon {
+        font-size: 1.4rem;
+        padding: 6px;
+        border-radius: 8px;
+      }
+    }
+
+    .card-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 8px 0;
+
+      small {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #64748b;
+      }
+    }
+
+    .card-footer {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      
+      .footer-desc {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+      }
+    }
+
+    // Specific stats card accents
+    &.total-budget {
+      border-top: 4px solid #0f4c81;
+      .card-header ion-icon { background: rgba(15, 76, 129, 0.1); color: #0f4c81; }
+    }
+
+    &.total-spent {
+      border-top: 4px solid #00b4d8;
+      .card-header ion-icon { background: rgba(0, 180, 216, 0.1); color: #00b4d8; }
+    }
+
+    &.remaining-budget {
+      border-top: 4px solid #10b981;
+      .card-header ion-icon { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+      
+      &.negative {
+        border-top-color: #ef4444;
+        .card-value { color: #ef4444; }
+        .card-header ion-icon { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+      }
+    }
+
+    &.spent-percentage {
+      border-top: 4px solid #f59e0b;
+      .card-header ion-icon { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+
+      .progress-bar-container {
+        width: 100%;
+        height: 6px;
+        background: #f1f5f9;
+        border-radius: 3px;
+        margin-top: 4px;
+        overflow: hidden;
+
+        .progress-bar-fill {
+          height: 100%;
+          background: #f59e0b;
+          border-radius: 3px;
+          transition: width 0.5s ease;
+
+          &.high {
+            background: #ef4444;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Dashboard Sections Grid
+.sections-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 24px;
+  align-items: start;
+
+  .section-card-group {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .section-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+    border: 1px solid #f1f5f9;
+
+    .section-title {
+      margin-bottom: 20px;
+      
+      h3 {
+        margin: 0;
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #0f172a;
+      }
+      p {
+        margin: 4px 0 0;
+        font-size: 0.85rem;
+        color: #64748b;
+      }
+    }
+  }
+}
+
+// Monthly Spending Chart List
+.monthly-spending {
+  .monthly-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .month-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .month-label {
+      width: 40px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #475569;
+      text-align: right;
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 14px;
+      background: #f1f5f9;
+      border-radius: 7px;
+      overflow: hidden;
+
+      .bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #0077b6 0%, #00b4d8 100%);
+        border-radius: 7px;
+        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+    }
+
+    .month-value {
+      width: 100px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #0f172a;
+      text-align: right;
+    }
+  }
+}
+
+// Category breakdown
+.category-breakdown {
+  .category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .category-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .cat-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 700;
+
+      .cat-name {
+        color: #475569;
+      }
+      .cat-value {
+        color: #0f172a;
+      }
+    }
+
+    .cat-progress-track {
+      width: 100%;
+      height: 6px;
+      background: #f1f5f9;
+      border-radius: 3px;
+      overflow: hidden;
+
+      .cat-progress-fill {
+        height: 100%;
+        background: #10b981;
+        border-radius: 3px;
+      }
+    }
+  }
+
+  .category-empty {
+    padding: 12px;
     text-align: center;
+    font-size: 0.85rem;
+    color: #94a3b8;
+    background: #f8fafc;
+    border-radius: 12px;
+  }
+}
+
+// Recent Transactions list
+.recent-transactions {
+  .transactions-list {
+    display: flex;
+    flex-direction: column;
     gap: 12px;
   }
 
-  .banner-title { font-size: 1.05em; }
-  .card-icon-wrap { width: 46px; height: 46px; }
+  .transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border-left: 4px solid #f87171;
+    font-size: 0.85rem;
+
+    .tx-details {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+
+      .tx-name {
+        font-weight: 700;
+        color: #1e293b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .tx-date {
+        font-size: 0.75rem;
+        color: #64748b;
+      }
+    }
+
+    .tx-amount {
+      font-weight: 800;
+      color: #ef4444;
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+  }
+
+  .transaction-empty {
+    padding: 12px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #94a3b8;
+    background: #f8fafc;
+    border-radius: 12px;
+  }
 }
 
-@media (min-width: 700px) {
-  .hospital-banner .banner-inner {
-    gap: 28px;
+// ---- RESPONSIVE DESIGN ----
+@media (max-width: 992px) {
+  .sections-grid {
+    grid-template-columns: 1fr;
   }
-  .banner-logo { width: 88px; height: 88px; }
-  .banner-title { font-size: 1.4em; }
+}
+
+@media (max-width: 768px) {
+  .dashboard-wrapper {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: 100%;
+    height: auto;
+    max-height: 250px;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    .sidebar-brand {
+      width: 100%;
+      padding: 12px 16px;
+      box-sizing: border-box;
+    }
+
+    .sidebar-nav {
+      flex-direction: row;
+      flex-wrap: wrap;
+      padding: 8px;
+      width: 100%;
+      box-sizing: border-box;
+
+      .nav-item {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        gap: 8px;
+      }
+    }
+
+    .sidebar-footer {
+      width: 100%;
+      flex-direction: row;
+      padding: 12px;
+      box-sizing: border-box;
+      
+      .btn-simulate, .btn-logout {
+        flex: 1;
+        padding: 8px;
+      }
+    }
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+
+  .dashboard-overview {
+    .overview-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
 }
